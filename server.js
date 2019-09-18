@@ -2,10 +2,14 @@ const express = require('express');
 const app = express();
 const dotenv = require('dotenv/config');
 const mongoose = require('mongoose');
+const cors = require('cors');
 mongoose.set('useCreateIndex', true);
 
 //body parser
 app.use(express.json());
+
+//enable cors
+app.use(cors());
 
 //Import Routes 
 const UserRoutes= require('./routes/users');

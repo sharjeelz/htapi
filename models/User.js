@@ -31,6 +31,10 @@ const UserSchema= mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    password: {
+        type: String,
+        required:true
     }
    
 })
