@@ -10,6 +10,7 @@ const schema = Joi.object({
     email: Joi.string().required().email(),
     password: Joi.string().min(6).required(),
     repeat_password: Joi.ref('password'),
+    gender: Joi.string()
 });
 return  schema.validate(req);
 
