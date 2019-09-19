@@ -12,4 +12,13 @@ router.put('/user/status', async (req, res) => {
     }
 });
 
+router.get('/user/list',async(req,res)=>{
+
+    try {
+        const users= await User.find({});
+        res.send(users);
+    } catch (error) {
+        
+    }
+})
 module.exports = router;
