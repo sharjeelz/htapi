@@ -4,7 +4,7 @@ const dotenv = require('dotenv/config');
 const mongoose = require('mongoose');
 const cors = require('cors');
 mongoose.set('useCreateIndex', true);
-
+const O3Auth= require('./routes/verfiy');
 //body parser
 app.use(express.json());
 
@@ -17,7 +17,7 @@ const adminRoutes= require('./routes/admin');
 
 //Use Middleware
 app.use('/user',UserRoutes);
-app.use('/admin',adminRoutes);
+app.use('/admin',O3Auth,adminRoutes);
 
 
 

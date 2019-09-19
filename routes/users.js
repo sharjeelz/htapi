@@ -57,13 +57,12 @@ router.post('/login', async (req, res) => {
     if (loginAuth) {
         return res.send('Password or email is wrong');
     }
-    res.send('Logged In!!');
+
+    //creat token
+    const token = jwt.sign({email:req.body.email},process.env.SECRET);
+    res.header('htpai-token',token).send(token);
+    
 
 
 });
-
-
-
-
-
 module.exports = router;
