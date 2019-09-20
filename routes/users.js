@@ -41,15 +41,12 @@ router.post('/register', async (req, res) => {
     try {
         
         const saveduser = await newuser.save();
-        const body= `<p><h2>Thank You, ${saveduser.first_name} ${saveduser.last_name} </h2> <hr/><p>We appriciate your effort towards a healthy community</p>`;
-        const subject= 'Welcome to Healthtallk.com'
-        const email= saveduser.email
-        const data  = {body:body, subject: subject, email :email }
+        let body= `<p><h2>Thank You, ${saveduser.first_name} ${saveduser.last_name} </h2> <hr/><p>We appriciate your effort towards a healthy community</p>`;
+        let subject= 'Welcome to Healthtallk.com'
+        let email= saveduser.email
+        let data  = {body:body, subject: subject, email :email }
         registerEvent.emit('sendRegisteremail',data);
         res.json({ user: saveduser._id });
-       
-        
-       
     } catch (err) {
         res.status(400).send(err);
     }
@@ -74,6 +71,7 @@ router.post('/login', async (req, res) => {
     //creat token
     const token = jwt.sign({ email: req.body.email }, process.env.SECRET);
     res.header('htpai-token', token).send(token);
+    res.json({ access_token: token});
 
 
 
