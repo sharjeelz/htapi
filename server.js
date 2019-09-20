@@ -2,9 +2,10 @@ const express = require('express');
 const app = express();
 const dotenv = require('dotenv/config');
 const mongoose = require('mongoose');
-const cors = require('cors');
 mongoose.set('useCreateIndex', true);
+const cors = require('cors');
 const O3Auth= require('./routes/verfiy');
+
 //body parser
 app.use(express.json());
 

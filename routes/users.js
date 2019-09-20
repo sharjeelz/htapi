@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { registerValidation, loginValidation } = require('../models/Validations/User');
 const { authLogin, setStatus } = require('../repositories/userRepo');
+const {registerEvent}= require('../Events/userEvents');
+
+
 
 
 // Register New User
@@ -32,12 +35,21 @@ router.post('/register', async (req, res) => {
         phone_number: req.body.phone_number,
         ip_address: req.ip,
         password: hashedpass,
-        gender:req.body.gender
+        gender: req.body.gender
     });
 
     try {
+        
         const saveduser = await newuser.save();
+        const body= `<p><h2>Thank You, ${saveduser.first_name} ${saveduser.last_name} </h2> <hr/><p>We appriciate your effort towards a healthy community</p>`;
+        const subject= 'Welcome to Healthtallk.com'
+        const email= saveduser.email
+        const data  = {body:body, subject: subject, email :email }
+        registerEvent.emit('sendRegisteremail',data);
         res.json({ user: saveduser._id });
+       
+        
+       
     } catch (err) {
         res.status(400).send(err);
     }
@@ -60,9 +72,9 @@ router.post('/login', async (req, res) => {
     }
 
     //creat token
-    const token = jwt.sign({email:req.body.email},process.env.SECRET);
-    res.header('htpai-token',token).send(token);
-    
+    const token = jwt.sign({ email: req.body.email }, process.env.SECRET);
+    res.header('htpai-token', token).send(token);
+
 
 
 });

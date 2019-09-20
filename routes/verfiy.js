@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const O3Auth= (req,res,next) => {
 
-    const token= req.header('htapi');
+    const token= req.header('htpai-token');
     if(!token) {
         return res.status(401).send('Access Denied');
     }

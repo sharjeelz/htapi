@@ -40,6 +40,6 @@ const UserSchema= mongoose.Schema({
         type: String,
     }
    
-})
+});
 
 module.exports= mongoose.model('Users',UserSchema);
