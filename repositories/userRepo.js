@@ -21,15 +21,29 @@ const authLogin = async (email, password) => {
 }
 
 
-const setStatus = async (id) => {
+const checkEmail = async (req,res,next) => {
     //Get user by Id
     try {
-        const user = await User.findOne({ _id: id});
-        console.log(user);
+        const emailExists = await User.findOne({ email: req.body.email});
+    if (emailExists) {
+        return res.status(400).send('Email Already Exists');
+    } else {
+        next();
+    }
+    
     } catch (err) {
         console.log(err);
     }
 }
 
-module.exports.authLogin = authLogin;
-module.exports.setStatus = setStatus;
+const createRegisterEmail = (saveduser) => {
+
+    let body= `<p><h2>Thank You, ${saveduser.first_name} ${saveduser.last_name} </h2> <hr/><p>We appriciate your effort towards a healthy community</p>`;
+    let subject= 'Welcome to Healthtallk.com'
+    let email= saveduser.email
+    return  {body:body, subject: subject, email :email }
+};
+
+module.exports.checkEmail = authLogin;
+module.exports.checkEmail = checkEmail;
+module.exports.createRegisterEmail = createRegisterEmail;

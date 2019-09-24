@@ -2,7 +2,7 @@ const Joi = require('@hapi/joi');
 
 //Register Validation 
 
-const registerValidation = (req) => {
+const registerValidation = (req,res,next) => {
     const schema = Joi.object({
         first_name: Joi.string().required().max(10),
         last_name: Joi.string().required().max(10),
@@ -12,7 +12,11 @@ const registerValidation = (req) => {
         repeat_password: Joi.ref('password'),
         gender: Joi.string()
     });
-    return schema.validate(req);
+    const validataionHas = schema.validate(req.body);
+    if (validataionHas.error) {
+             return res.status(400).send(validataionHas.error.details[0].message);
+         }
+    next();
 }
 
 //Login Validation 

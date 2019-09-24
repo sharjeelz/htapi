@@ -4,30 +4,18 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { registerValidation, loginValidation } = require('../models/Validations/User');
-const { authLogin, setStatus } = require('../repositories/userRepo');
+const { authLogin, checkEmail,createRegisterEmail } = require('../repositories/userRepo');
 const {registerEvent}= require('../Events/userEvents');
 
 
 
 
 // Register New User
-router.post('/register', async (req, res) => {
-
-    //validate the request data
-    const validataionHas = registerValidation(req.body);
-    if (validataionHas.error) {
-        return res.status(400).send(validataionHas.error.details[0].message);
-    }
-
-    //check if user with this email already exists
-    const emailExists = await User.findOne({ email: req.body.email });
-    if (emailExists) {
-        return res.status(400).send('Email Already Exists');
-    }
+router.post('/register',[registerValidation,checkEmail], async (req, res) => {
+    
     // hash the password and register the user        
     const salt = await bcrypt.genSalt(10);
     const hashedpass = await bcrypt.hash(req.body.password, salt);
-
     const newuser = new User({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
@@ -39,12 +27,8 @@ router.post('/register', async (req, res) => {
     });
 
     try {
-        
         const saveduser = await newuser.save();
-        let body= `<p><h2>Thank You, ${saveduser.first_name} ${saveduser.last_name} </h2> <hr/><p>We appriciate your effort towards a healthy community</p>`;
-        let subject= 'Welcome to Healthtallk.com'
-        let email= saveduser.email
-        let data  = {body:body, subject: subject, email :email }
+        const data = createRegisterEmail(saveduser);
         registerEvent.emit('sendRegisteremail',data);
         res.json({ user: saveduser._id });
     } catch (err) {
@@ -70,8 +54,8 @@ router.post('/login', async (req, res) => {
 
     //creat token
     const token = jwt.sign({ email: req.body.email }, process.env.SECRET);
-    res.header('htpai-token', token).send(token);
-    res.json({ access_token: token});
+    res.header('htpai-token', token).
+    json({ access_token: token});
 
 
 

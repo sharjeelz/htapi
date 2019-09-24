@@ -9,16 +9,16 @@ const nodemailer = require('nodemailer');
       });
       
     async function sendEmail   (data){
-        //return console.log(data);
         const mailOptions = {
             from: 'admin@healthtallk.com',
-            to: 'sharjeel.zubair@virtualforce.io',
+            to: data.email,
             subject: data.subject,
             html: data.body
             };
     try {
         
         await transporter.sendMail(mailOptions);
+        console.log('sent');
         
     } catch (error) {
      
