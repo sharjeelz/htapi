@@ -5,15 +5,19 @@ const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 const cors = require('cors');
 const O3Auth= require('./routes/verfiy');
-const test = require('./repositories/test');
 
 
-//connect to DB
-
-mongoose.connect(process.env.DB_URL,{ useNewUrlParser: true, useUnifiedTopology:true  }, ()=>{
-   
+//connect server and  DB
+app.listen(process.env.PORT,()=>{
+    console.log(`Server Running on port : ${process.env.PORT}`);
+    mongoose.connect(process.env.DB_URL,{ useNewUrlParser: true, useUnifiedTopology:true  }, ()=>{
     console.log('DB Connected (MLAB)');
+    });
 });
+
+
+
+
 
 //body parser
 app.use(express.json());
@@ -29,14 +33,6 @@ const adminRoutes= require('./routes/admin');
 app.use('/user',UserRoutes);
 app.use('/admin',O3Auth,adminRoutes);
 
-try {
-    console.log(test.hashpass('asd'));
-} catch (error) {
-    console.log(error);
-}
 
 
 
-app.listen(process.env.PORT,()=>{
-    console.log(`Server Running on port : ${process.env.PORT}`)
-});

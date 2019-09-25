@@ -4,8 +4,8 @@ const Joi = require('@hapi/joi');
 
 const registerValidation = (req,res,next) => {
     const schema = Joi.object({
-        first_name: Joi.string().required().max(10),
-        last_name: Joi.string().required().max(10),
+        first_name: Joi.string().required(),
+        last_name: Joi.string().required(),
         phone_number: Joi.number().required(),
         email: Joi.string().required().email().max(30),
         password: Joi.string().min(6).required(),
@@ -35,12 +35,12 @@ const loginValidation = (req,res,next) => {
 }
 const ForgotPasswordValidation = (req) => {
     const schema = Joi.object({
-        email: Joi.string().required().email(),
-        password: Joi.string().min(6).required(),
+        phone_number: Joi.string().required()
     });
     return { error, data } = schema.validate(req);
 }
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
+module.exports.ForgotPasswordValidation = ForgotPasswordValidation;
 
