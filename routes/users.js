@@ -2,27 +2,20 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const { registerValidation, loginValidation } = require('../models/Validations/User');
-const { authLogin, checkEmail,createRegisterEmail } = require('../repositories/userRepo');
+const { authLogin, checkEmail,createRegisterEmail,getHashedPassword } = require('../repositories/userRepo');
 const {registerEvent}= require('../Events/userEvents');
-
-
-
 
 // Register New User
 router.post('/register',[registerValidation,checkEmail], async (req, res) => {
-    
-    // hash the password and register the user        
-    const salt = await bcrypt.genSalt(10);
-    const hashedpass = await bcrypt.hash(req.body.password, salt);
+    /** Save the User */
     const newuser = new User({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
         phone_number: req.body.phone_number,
         ip_address: req.ip,
-        password: hashedpass,
+        password:  await getHashedPassword(req.body.password),
         gender: req.body.gender
     });
 
@@ -30,32 +23,18 @@ router.post('/register',[registerValidation,checkEmail], async (req, res) => {
         const saveduser = await newuser.save();
         const data = createRegisterEmail(saveduser);
         registerEvent.emit('sendRegisteremail',data);
-        res.json({ user: saveduser._id });
+        res.status(200).json({ user: saveduser._id });
     } catch (err) {
         res.status(400).send(err);
     }
-
-
-
 });
 
 //Login User
-router.post('/login', async (req, res) => {
-    //validate the request data
-    const validataionHas = loginValidation(req.body);
-    if (validataionHas.error) {
-        return res.status(400).send(validataionHas.error.details[0].message);
-    }
-
-    loginAuth = await authLogin(req.body.email, req.body.password);
-    if (loginAuth) {
-        return res.send('Password or email is wrong');
-    }
-
+router.post('/login',[loginValidation,authLogin], async (req, res) => {
+    
     //creat token
     const token = jwt.sign({ email: req.body.email }, process.env.SECRET);
-    res.header('htpai-token', token).
-    json({ access_token: token});
+    res.header('htpai-token', token).json({ access_token: token});
 
 
 
