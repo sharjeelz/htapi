@@ -18,7 +18,7 @@ const nodemailer = require('nodemailer');
     try {
         
         await transporter.sendMail(mailOptions);
-        console.log('sent');
+        console.log('Email Sent')
         
     } catch (error) {
      

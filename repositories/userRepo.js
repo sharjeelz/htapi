@@ -54,6 +54,6 @@ const createRegisterEmail = (saveduser) => {
 };
 
 module.exports.authLogin = authLogin;
-module.exports.checkEmail = checkEmail;
+module.exports.checkEmailExists = checkEmail;
 module.exports.createRegisterEmail = createRegisterEmail;
 module.exports.getHashedPassword = hashedpass;

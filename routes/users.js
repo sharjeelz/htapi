@@ -3,11 +3,12 @@ const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { registerValidation, loginValidation } = require('../models/Validations/User');
-const { authLogin, checkEmail,createRegisterEmail,getHashedPassword } = require('../repositories/userRepo');
+const { authLogin, checkEmailExists,createRegisterEmail,getHashedPassword } = require('../repositories/userRepo');
 const {registerEvent}= require('../Events/userEvents');
 
 // Register New User
-router.post('/register',[registerValidation,checkEmail], async (req, res) => {
+router.post('/register',[registerValidation,checkEmailExists], async (req, res) => {
+    
     /** Save the User */
     const newuser = new User({
         first_name: req.body.first_name,
@@ -23,6 +24,7 @@ router.post('/register',[registerValidation,checkEmail], async (req, res) => {
         const saveduser = await newuser.save();
         const data = createRegisterEmail(saveduser);
         registerEvent.emit('sendRegisteremail',data);
+        //registerEvent.emit('sendRegistersms',saveduser);
         res.status(200).json({ user: saveduser._id });
     } catch (err) {
         res.status(400).send(err);
