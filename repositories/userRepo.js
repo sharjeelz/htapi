@@ -1,6 +1,9 @@
 
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const dError = 'Data Error';
+const eOpE= 'Password or email is wrong';
+const eE= 'Email Already Exists';
 
 const hashedpass = async (password)=> {
  /** hash the password */ 
@@ -14,12 +17,18 @@ const authLogin = async (req, res, next) => {
     try {
         const user = await User.findOne({ email: req.body.email, status: 1 });
         if (!user) {
-            res.send('Password or email is wrong');
+            return res.status(400).json({
+                message : dError,
+                error: eOpE
+            });
         }
         else {
             const validPassword = await bcrypt.compare(req.body.password, user.password);
             if (!validPassword) {
-                res.send('Password or email is wrong');
+                return res.status(400).json({
+                    message : dError,
+                    error: eOpE
+                });
             }
             next();
         }
@@ -35,7 +44,10 @@ const checkEmail = async (req, res, next) => {
     try {
         const emailExists = await User.findOne({ email: req.body.email });
         if (emailExists) {
-            return res.status(400).send('Email Already Exists');
+            return res.status(400).json({
+                message : dError,
+                error: eE
+            })
         } else {
             next();
         }

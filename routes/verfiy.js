@@ -3,9 +3,12 @@ const jwt = require('jsonwebtoken');
 
 const O3Auth= (req,res,next) => {
 
-    const token= req.header('htpai-token');
+    const token= req.header('htapi-token');
     if(!token) {
-        return res.status(401).send('Access Denied');
+        return res.status(401).json({
+            message : 'Access Error',
+            error: 'Access Denied'
+        });
     }
 
     try {
@@ -15,7 +18,10 @@ const O3Auth= (req,res,next) => {
         next();
         
     } catch (error) {
-        res.status(400).send('Invalid Token');
+        return res.status(400).json({
+            message : 'Access Error',
+            error: 'Invalid Token'
+        });
     }
 }
 

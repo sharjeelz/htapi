@@ -1,6 +1,7 @@
 const Joi = require('@hapi/joi');
 
 //Register Validation 
+const vErro = 'Validation Error';
 
 const registerValidation = (req,res,next) => {
     const schema = Joi.object({
@@ -14,7 +15,10 @@ const registerValidation = (req,res,next) => {
     });
     const validataionHas = schema.validate(req.body);
     if (validataionHas.error) {
-             return res.status(400).send(validataionHas.error.details[0].message);
+        return res.status(400).json({
+            message : vErro,
+            error: validataionHas.error.details[0].message
+        });
          }
     next();
 }
@@ -29,7 +33,10 @@ const loginValidation = (req,res,next) => {
 
     const validataionHas = schema.validate(req.body);
     if (validataionHas.error) {
-        return res.status(400).send(validataionHas.error.details[0].message);
+        return res.status(400).json({
+            message : vErro,
+            error: validataionHas.error.details[0].message
+        });
     }
     next();
 }
