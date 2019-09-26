@@ -3,6 +3,7 @@ const app = express();
 const dotenv = require('dotenv/config');
 const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 const cors = require('cors');
 const adminAuth = require('./routes/verfiy');
 
