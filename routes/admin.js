@@ -11,42 +11,40 @@ router.put('/user/:id', async (req, res) => {
         updateOps[ops.prop] = ops.value;
 
     }
-    
-    await User.updateOne({_id: req.params.id},{$set: updateOps}).then(()=>{
-        res.status(200).json({message:`Document ID ${req.params.id} updated`});
+
+    await User.updateOne({ _id: req.params.id }, { $set: updateOps }).then(() => {
+        res.status(200).json({ message: `Document ID ${req.params.id} updated` });
     }).catch(err => {
         res.status(400).send(err);
     })
 });
 
-router.get('/user/list',async(req,res)=>{
-
-  
-        await User
+router.get('/user/list', async (req, res) => {
+    await User
         .find({})
         .select('first_name last_name email phone_number date')
-        .populate('utype','utype')
-        .then(data=>{
+        .populate('utype', 'utype')
+        .then(data => {
             res.send(data);
-        }).catch(err=>{
+        }).catch(err => {
             console.log(err);
-        });  
+        });
 });
 
 //Migrations
-router.get('/migrate',async (req,res)=>{
+router.get('/migrate', async (req, res) => {
 
-utype1= new UserType({
-    utype:'Admin'
-});
+    utype1 = new UserType({
+        utype: 'Admin'
+    });
 
-await utype1.save();
+    await utype1.save();
 
-utype2= new UserType({
-    utype:'Public'
-});
+    utype2 = new UserType({
+        utype: 'Public'
+    });
 
-await utype2.save();
+    await utype2.save();
 
 });
 

@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const PasswordReset = require('../models/PasswordReset');
 const jwt = require('jsonwebtoken');
-const { registerValidation, loginValidation } = require('../models/Validations/User');
+const { registerValidation, loginValidation, forgotPasswordValidation} = require('../models/Validations/User');
 const userType = require('../models/UserType');
-const { authLogin, checkEmailExists,createRegisterEmail,getHashedPassword } = require('../repositories/userRepo');
+const { authLogin, checkEmailExists,createRegisterEmail,getHashedPassword, ValidatePhone } = require('../repositories/userRepo');
 const {registerEvent}= require('../Events/userEvents');
 
 // Register New User
@@ -50,7 +51,11 @@ router.post('/register',[registerValidation,checkEmailExists], async (req, res) 
                 });
         })
             .catch(err=>{
-                res.status(400).send(err);
+
+                res.status(400).json({
+                    message : "Data Error",
+                    error : err.errmsg
+                })
         })
     });
 
@@ -74,6 +79,22 @@ router.post('/login',[loginValidation,authLogin], async (req, res) => {
 
 
 //Forgot Password
+router.post('/resetpassword',[ValidatePhone], async (req, res) => {
 
+    //save in data base
+    password_reset = new PasswordReset({
+        user: res.datas._id,
+        code : '1234'
+    });
+    await password_reset.save().then(data=>{
+        res.status(200).json({
+            message : "Code Successfuly Sent To your number",
+            data: {
+                code: data.code
+            }
+        })
+    })
+
+});
 
 module.exports = router;

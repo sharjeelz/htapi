@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-
+var moment = require('moment');
+const now = moment().format();
 
 const UserSchema= mongoose.Schema({
 
@@ -18,7 +19,8 @@ const UserSchema= mongoose.Schema({
     },
     phone_number: {
         type: String,
-        required : true
+        required : true,
+        unique:true
     },
     ip_address: {
         type: String,
@@ -29,8 +31,8 @@ const UserSchema= mongoose.Schema({
         default :1
     },
     date: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: now
     },
     password: {
         type: String,

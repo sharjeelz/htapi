@@ -40,14 +40,21 @@ const loginValidation = (req,res,next) => {
     }
     next();
 }
-const ForgotPasswordValidation = (req) => {
+const ForgotPasswordValidation = (req,res,next) => {
     const schema = Joi.object({
         phone_number: Joi.string().required()
     });
-    return { error, data } = schema.validate(req);
+    const validataionHas  = schema.validate(req.body);
+    if (validataionHas.error) {
+        return res.status(400).json({
+            message : vErro,
+            error: validataionHas.error.details[0].message
+        });
+    }
+    next();
 }
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
-module.exports.ForgotPasswordValidation = ForgotPasswordValidation;
+module.exports.forgotPasswordValidation = ForgotPasswordValidation;
 

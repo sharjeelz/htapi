@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 
-const O3Auth= (req,res,next) => {
+const adminAuth= (req,res,next) => {
 
     const token= req.header('htapi-token');
     if(!token) {
@@ -25,4 +25,4 @@ const O3Auth= (req,res,next) => {
     }
 }
 
-module.exports= O3Auth;
+module.exports= adminAuth;

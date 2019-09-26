@@ -1,9 +1,11 @@
 
 const User = require('../models/User');
+const PasswordReset = require('../models/PasswordReset');
 const bcrypt = require('bcryptjs');
 const dError = 'Data Error';
 const eOpE= 'Password or email is wrong';
 const eE= 'Email Already Exists';
+const fNf ='Phone Number Not Found';
 
 const hashedpass = async (password)=> {
  /** hash the password */ 
@@ -66,6 +68,25 @@ const createRegisterEmail = (saveduser) => {
 };
 
 
+const validPhone = (req,res,next)=> {
+
+    User.findOne({phone_number:req.body.phone_number}).then(data=> {
+        if(!data) {
+            return res.status(404).json({
+                message : dError,
+                error: fNf
+            })
+        } else {
+             res.datas = data;
+            next();
+        }
+    })
+    .catch(err=>{
+        console.log(err);
+    })
+
+}
+
 
 
 
@@ -73,3 +94,5 @@ module.exports.authLogin = authLogin;
 module.exports.checkEmailExists = checkEmail;
 module.exports.createRegisterEmail = createRegisterEmail;
 module.exports.getHashedPassword = hashedpass;
+module.exports.ValidatePhone = validPhone;
+
