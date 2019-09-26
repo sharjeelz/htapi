@@ -1,81 +1,111 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const PasswordReset = require('../models/PasswordReset');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { registerValidation, loginValidation } = require('../models/Validations/User');
-const { authLogin, setStatus } = require('../repositories/userRepo');
-const {registerEvent}= require('../Events/userEvents');
-
-
-
+const { registerValidation, loginValidation, forgotPasswordValidation} = require('../models/Validations/User');
+const userType = require('../models/UserType');
+const { authLogin, checkuserExists,createRegisterEmail,getHashedPassword, ValidatePhone } = require('../repositories/userRepo');
+const {userEvent}= require('../Events/userEvents');
 
 // Register New User
-router.post('/register', async (req, res) => {
-
-    //validate the request data
-    const validataionHas = registerValidation(req.body);
-    if (validataionHas.error) {
-        return res.status(400).send(validataionHas.error.details[0].message);
-    }
-
-    //check if user with this email already exists
-    const emailExists = await User.findOne({ email: req.body.email });
-    if (emailExists) {
-        return res.status(400).send('Email Already Exists');
-    }
-    // hash the password and register the user        
-    const salt = await bcrypt.genSalt(10);
-    const hashedpass = await bcrypt.hash(req.body.password, salt);
-
+router.post('/register',[registerValidation,checkuserExists], async (req, res) => {
+     /** Save the User */
     const newuser = new User({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
         phone_number: req.body.phone_number,
         ip_address: req.ip,
-        password: hashedpass,
-        gender: req.body.gender
+        password:   await getHashedPassword(req.body.password),
+        gender: req.body.gender,
+        utype:await userType.findOne({utype:'Public'})
+    });
+            await newuser
+            .save()
+            .then(saveduser=>{
+                //const data = createRegisterEmail(saveduser);
+                //userEvent.emit('sendRegisteremail',data);
+                userEvent.emit('sendRegistersms',saveduser,'Welcome to HT'); 
+                res.status(201).json({
+                    message: "User Created Successfuly",
+                    data: {
+                        user : {
+                            _id: saveduser._id,
+                            first_name: saveduser.first_name,
+                            last_name: saveduser.last_name,
+                            email: saveduser.email,
+                            phone_number:saveduser.phone_number,
+                            utype: saveduser.utype,
+                            date: saveduser.date
+                        },
+                        response : {
+                            type : 'POST',
+                            url : 'http://'+req.headers.host+'/user/login',
+                            params : {
+                                "email" : "String",
+                                "password" : "String"
+                            }
+                        }
+                    }
+                });
+        })
+            .catch(err=>{
+
+                res.status(400).json({
+                    message : "Data Error",
+                    error : err.errmsg
+                })
+        })
     });
 
-    try {
-        
-        const saveduser = await newuser.save();
-        let body= `<p><h2>Thank You, ${saveduser.first_name} ${saveduser.last_name} </h2> <hr/><p>We appriciate your effort towards a healthy community</p>`;
-        let subject= 'Welcome to Healthtallk.com'
-        let email= saveduser.email
-        let data  = {body:body, subject: subject, email :email }
-        registerEvent.emit('sendRegisteremail',data);
-        res.json({ user: saveduser._id });
-    } catch (err) {
-        res.status(400).send(err);
-    }
-
-
-
-});
-
 //Login User
-router.post('/login', async (req, res) => {
-    //validate the request data
-    const validataionHas = loginValidation(req.body);
-    if (validataionHas.error) {
-        return res.status(400).send(validataionHas.error.details[0].message);
-    }
-
-    loginAuth = await authLogin(req.body.email, req.body.password);
-    if (loginAuth) {
-        return res.send('Password or email is wrong');
-    }
-
+router.post('/login',[loginValidation,authLogin], async (req, res) => {
+    
     //creat token
     const token = jwt.sign({ email: req.body.email }, process.env.SECRET);
-    res.header('htpai-token', token).send(token);
-    res.json({ access_token: token});
-
-
+    res.header('htapi-token', token).json({
+        message : "Login Successful",
+        data : {
+             access_token: token
+        },
+        meta : {
+            "message" : "use the above token to access private resources"
+        }
+    });
 
 });
 
+
+
+//Forgot Password
+router.post('/resetpassword',[forgotPasswordValidation,ValidatePhone], async (req, res) => {
+
+    //save in data base
+    password_reset = new PasswordReset({
+        user: res.datas._id,
+        code : genOtp()
+    });
+    await password_reset.save().then(async data=>{
+        await User.findOne({_id:res.datas._id}).then(user=>{
+            //userEvent.emit('sendPasswordResetCode',user,'Your OTP is '+data.code);
+            res.status(200).json({
+                message : "Code Successfuly Sent To your number",
+                data: {
+                    code: data.code
+                }
+            })
+        })
+        
+    })
+
+});
+
+
+const genOtp= ()=> {
+
+    return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1);
+
+}
 
 module.exports = router;

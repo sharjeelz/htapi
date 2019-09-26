@@ -1,24 +1,51 @@
 const express = require('express');
 const router = express.Router();
+const UserType = require('../models/UserType');
 const User = require('../models/User');
 
-router.put('/user/status', async (req, res) => {
-    try {
-    await User.updateOne({ _id: req.body.id }, { status: req.body.status });
-    res.status(200).json({message:`Document ID ${req.body.id} updated`});
-    } catch (error) {
-        console.log(error);
-        res.status(400).send('Something Went Wrong!');
+
+router.put('/user/:id', async (req, res) => {
+
+    const updateOps = {};
+    for (const ops of req.body) {
+        updateOps[ops.prop] = ops.value;
+
     }
+
+    await User.updateOne({ _id: req.params.id }, { $set: updateOps }).then(() => {
+        res.status(200).json({ message: `Document ID ${req.params.id} updated` });
+    }).catch(err => {
+        res.status(400).send(err);
+    })
 });
 
-router.get('/user/list',async(req,res)=>{
+router.get('/user/list', async (req, res) => {
+    await User
+        .find({})
+        .select('first_name last_name email phone_number date')
+        .populate('utype', 'utype')
+        .then(data => {
+            res.send(data);
+        }).catch(err => {
+            console.log(err);
+        });
+});
 
-    try {
-        const users= await User.find({});
-        res.send(users);
-    } catch (error) {
-        
-    }
-})
+//Migrations
+router.get('/migrate', async (req, res) => {
+
+    utype1 = new UserType({
+        utype: 'Admin'
+    });
+
+    await utype1.save();
+
+    utype2 = new UserType({
+        utype: 'Public'
+    });
+
+    await utype2.save();
+
+});
+
 module.exports = router;
