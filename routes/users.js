@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const { registerValidation, loginValidation, forgotPasswordValidation} = require('../models/Validations/User');
 const userType = require('../models/UserType');
 const { authLogin, checkuserExists,createRegisterEmail,getHashedPassword, ValidatePhone } = require('../repositories/userRepo');
-const {registerEvent}= require('../Events/userEvents');
+const {userEvent}= require('../Events/userEvents');
 
 // Register New User
 router.post('/register',[registerValidation,checkuserExists], async (req, res) => {
@@ -25,8 +25,8 @@ router.post('/register',[registerValidation,checkuserExists], async (req, res) =
             .save()
             .then(saveduser=>{
                 //const data = createRegisterEmail(saveduser);
-                //registerEvent.emit('sendRegisteremail',data);
-                //registerEvent.emit('sendRegistersms',saveduser); 
+                //userEvent.emit('sendRegisteremail',data);
+                userEvent.emit('sendRegistersms',saveduser,'Welcome to HT'); 
                 res.status(201).json({
                     message: "User Created Successfuly",
                     data: {
@@ -86,13 +86,17 @@ router.post('/resetpassword',[ValidatePhone], async (req, res) => {
         user: res.datas._id,
         code : '1234'
     });
-    await password_reset.save().then(data=>{
-        res.status(200).json({
-            message : "Code Successfuly Sent To your number",
-            data: {
-                code: data.code
-            }
+    await password_reset.save().then(async data=>{
+        await User.findOne({_id:res.datas._id}).then(user=>{
+            userEvent.emit('sendPasswordResetCode',user,'Your OTP is '+data.code);
+            res.status(200).json({
+                message : "Code Successfuly Sent To your number",
+                data: {
+                    code: data.code
+                }
+            })
         })
+        
     })
 
 });
