@@ -160,6 +160,9 @@ router.post('/changepassword',async (req,res)=> {
     await User.findOneAndUpdate({_id:req.body.user_id},{password:hasp}).then(data=>{
         res.status(200).json({
             message : "Password Changed Successfully",
+            next : {
+                message  : "Yoo may ask user to sign in with new password now"
+            }
         })
     }).catch(err=>{
         
