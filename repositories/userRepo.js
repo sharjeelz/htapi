@@ -4,7 +4,7 @@ const PasswordReset = require('../models/PasswordReset');
 const bcrypt = require('bcryptjs');
 const dError = 'Data Error';
 const eOpE= 'Password or email is wrong';
-const eE= 'Email Already Exists';
+const eE= 'User Already Exists';
 const fNf ='Phone Number Not Found';
 
 const hashedpass = async (password)=> {
@@ -41,10 +41,11 @@ const authLogin = async (req, res, next) => {
 }
 
 
-const checkEmail = async (req, res, next) => {
+const checkEmailPhone = async (req, res, next) => {
     //Get user by Id
     try {
-        const emailExists = await User.findOne({ email: req.body.email });
+        
+        const emailExists = await User.findOne({$or:[{email: req.body.email},{phone_number:req.body.phone_number}]});
         if (emailExists) {
             return res.status(400).json({
                 message : dError,
@@ -91,7 +92,7 @@ const validPhone = (req,res,next)=> {
 
 
 module.exports.authLogin = authLogin;
-module.exports.checkEmailExists = checkEmail;
+module.exports.checkuserExists = checkEmailPhone;
 module.exports.createRegisterEmail = createRegisterEmail;
 module.exports.getHashedPassword = hashedpass;
 module.exports.ValidatePhone = validPhone;

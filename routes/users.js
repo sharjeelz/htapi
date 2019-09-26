@@ -5,11 +5,11 @@ const PasswordReset = require('../models/PasswordReset');
 const jwt = require('jsonwebtoken');
 const { registerValidation, loginValidation, forgotPasswordValidation} = require('../models/Validations/User');
 const userType = require('../models/UserType');
-const { authLogin, checkEmailExists,createRegisterEmail,getHashedPassword, ValidatePhone } = require('../repositories/userRepo');
+const { authLogin, checkuserExists,createRegisterEmail,getHashedPassword, ValidatePhone } = require('../repositories/userRepo');
 const {registerEvent}= require('../Events/userEvents');
 
 // Register New User
-router.post('/register',[registerValidation,checkEmailExists], async (req, res) => {
+router.post('/register',[registerValidation,checkuserExists], async (req, res) => {
      /** Save the User */
     const newuser = new User({
         first_name: req.body.first_name,
