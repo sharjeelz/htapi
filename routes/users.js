@@ -79,16 +79,16 @@ router.post('/login',[loginValidation,authLogin], async (req, res) => {
 
 
 //Forgot Password
-router.post('/resetpassword',[ValidatePhone], async (req, res) => {
+router.post('/resetpassword',[forgotPasswordValidation,ValidatePhone], async (req, res) => {
 
     //save in data base
     password_reset = new PasswordReset({
         user: res.datas._id,
-        code : '1234'
+        code : genOtp()
     });
     await password_reset.save().then(async data=>{
         await User.findOne({_id:res.datas._id}).then(user=>{
-            userEvent.emit('sendPasswordResetCode',user,'Your OTP is '+data.code);
+            //userEvent.emit('sendPasswordResetCode',user,'Your OTP is '+data.code);
             res.status(200).json({
                 message : "Code Successfuly Sent To your number",
                 data: {
@@ -100,5 +100,12 @@ router.post('/resetpassword',[ValidatePhone], async (req, res) => {
     })
 
 });
+
+
+const genOtp= ()=> {
+
+    return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1);
+
+}
 
 module.exports = router;
