@@ -17,7 +17,7 @@ var useragent = require('express-useragent');
 // Register New User
 router.post('/register',[registerValidation,checkuserExists,useragent.express()], async (req, res) => {
         /** Get Location Params : TODO: see how req.ip will return data and then pass it to getLocation */ 
-        const my_location= getLocation('202.166.163.180');
+        const my_location= getLocation(req.ip);
         /** Save the User */
         const newuser = new User({
         first_name: req.body.first_name,
