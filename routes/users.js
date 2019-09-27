@@ -10,19 +10,34 @@ const {userEvent}= require('../Events/userEvents');
 var moment = require('moment');
 const now = moment().format();
 const expiry = moment().add('60','s').format();
+const getLocation = require('../functions/geoip');
+
 
 // Register New User
 router.post('/register',[registerValidation,checkuserExists], async (req, res) => {
-     /** Save the User */
-    const newuser = new User({
+
+        /** Get Location Params */
+        const my_location= getLocation('202.166.163.180');
+        console.log(my_location);
+        /** Save the User */
+        const newuser = new User({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
         phone_number: req.body.phone_number,
-        ip_address: req.ip,
+        ip_address:  req.ip,
         password:   await getHashedPassword(req.body.password),
         gender: req.body.gender,
-        utype:await userType.findOne({utype:'Public'})
+        utype:await userType.findOne({utype:'Public'}),
+        location : [
+            {country:my_location.country},
+            {region:my_location.region},
+            {city:my_location.city},
+            {ll:my_location.ll},
+            {timezone: my_location.timezone}
+
+        ]
+       
     });
             await newuser
             .save()
@@ -30,6 +45,7 @@ router.post('/register',[registerValidation,checkuserExists], async (req, res) =
                 //const data = createRegisterEmail(saveduser);
                 //userEvent.emit('sendRegisteremail',data);
                 //userEvent.emit('sendRegistersms',saveduser.phone_number,'Welcome to HT'); 
+
                 res.status(201).json({
                     message: "User Created Successfuly",
                     data: {

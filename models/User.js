@@ -41,7 +41,8 @@ const UserSchema= mongoose.Schema({
     gender: {
         type: String,
     },
-    utype: { type: mongoose.Schema.Types.ObjectId, ref: 'UserType' }
+    utype: { type: mongoose.Schema.Types.ObjectId, ref: 'UserType' },
+    location: {type: Array}
 });
 
 module.exports= mongoose.model('Users',UserSchema);
