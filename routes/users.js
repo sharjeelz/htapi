@@ -39,13 +39,11 @@ router.post('/register',[registerValidation,checkuserExists,useragent.express()]
         others:{agent_data: req.useragent}
        
     });
-
-    return res.send(newuser);
             await newuser
             .save()
             .then(saveduser=>{
-                //const data = createRegisterEmail(saveduser);
-                //userEvent.emit('sendRegisteremail',data);
+                const data = createRegisterEmail(saveduser);
+                userEvent.emit('sendRegisteremail',data);
                 //userEvent.emit('sendRegistersms',saveduser.phone_number,'Welcome to HT'); 
 
                 res.status(201).json({
