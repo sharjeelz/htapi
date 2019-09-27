@@ -11,14 +11,13 @@ var moment = require('moment');
 const now = moment().format();
 const expiry = moment().add('60','s').format();
 const getLocation = require('../functions/geoip');
+var useragent = require('express-useragent');
 
 
 // Register New User
-router.post('/register',[registerValidation,checkuserExists], async (req, res) => {
-
-        /** Get Location Params */
+router.post('/register',[registerValidation,checkuserExists,useragent.express()], async (req, res) => {
+        /** Get Location Params : TODO: see how req.ip will return data and then pass it to getLocation */ 
         const my_location= getLocation('202.166.163.180');
-        console.log(my_location);
         /** Save the User */
         const newuser = new User({
         first_name: req.body.first_name,
@@ -36,9 +35,12 @@ router.post('/register',[registerValidation,checkuserExists], async (req, res) =
             {ll:my_location.ll},
             {timezone: my_location.timezone}
 
-        ]
+        ],
+        others:{agent_data: req.useragent}
        
     });
+
+    return res.send(newuser);
             await newuser
             .save()
             .then(saveduser=>{

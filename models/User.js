@@ -42,7 +42,8 @@ const UserSchema= mongoose.Schema({
         type: String,
     },
     utype: { type: mongoose.Schema.Types.ObjectId, ref: 'UserType' },
-    location: {type: Array}
+    location: {type: Array},
+    others : {type: Array}
 });
 
 module.exports= mongoose.model('Users',UserSchema);
