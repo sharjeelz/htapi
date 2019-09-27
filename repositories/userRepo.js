@@ -88,6 +88,11 @@ const validPhone = (req,res,next)=> {
 
 }
 
+const verifyOtp = (req,res,next)=> {
+
+    console.log(req.body);
+}
+
 
 
 
@@ -96,4 +101,5 @@ module.exports.checkuserExists = checkEmailPhone;
 module.exports.createRegisterEmail = createRegisterEmail;
 module.exports.getHashedPassword = hashedpass;
 module.exports.ValidatePhone = validPhone;
+module.exports.verifyOtp = verifyOtp;
 

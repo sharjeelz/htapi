@@ -1,4 +1,7 @@
 const jwt = require('jsonwebtoken');
+const eE= 'Access Error';
+const aD= 'Access Denied';
+const iT= 'Invalid Token';
 
 
 const adminAuth= (req,res,next) => {
@@ -6,8 +9,8 @@ const adminAuth= (req,res,next) => {
     const token= req.header('htapi-token');
     if(!token) {
         return res.status(401).json({
-            message : 'Access Error',
-            error: 'Access Denied'
+            message : eE,
+            error: aD
         });
     }
 
@@ -19,8 +22,8 @@ const adminAuth= (req,res,next) => {
         
     } catch (error) {
         return res.status(400).json({
-            message : 'Access Error',
-            error: 'Invalid Token'
+            message : aE,
+            error: iT
         });
     }
 }

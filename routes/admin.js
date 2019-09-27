@@ -22,7 +22,8 @@ router.put('/user/:id', async (req, res) => {
 router.get('/user/list', async (req, res) => {
     await User
         .find({})
-        .select('first_name last_name email phone_number date')
+         .sort([['date', -1]])
+        .select('first_name last_name email phone_number date location')
         .populate('utype', 'utype')
         .then(data => {
             res.send(data);

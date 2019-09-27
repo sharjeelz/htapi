@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 var moment = require('moment');
 const now = moment().format();
-const expiry = moment().add('1','h').format();
-
+const expiry = moment().add('60','s').format();
 
 
 
