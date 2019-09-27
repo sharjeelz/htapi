@@ -6,6 +6,12 @@ const User = require('../models/User');
 
 router.put('/user/:id', async (req, res) => {
 
+    if(!req.body){
+        return res.status(400).json({
+            message: 'Validataion Error',
+            error : 'Parameters Missing'
+        })
+    }
     const updateOps = {};
     for (const ops of req.body) {
         updateOps[ops.prop] = ops.value;

@@ -22,7 +22,7 @@ const adminAuth= (req,res,next) => {
         
     } catch (error) {
         return res.status(400).json({
-            message : aE,
+            message : eE,
             error: iT
         });
     }

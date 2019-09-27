@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const PasswordReset = require('../models/PasswordReset');
 const jwt = require('jsonwebtoken');
-const { registerValidation, loginValidation, forgotPasswordValidation} = require('../models/Validations/User');
+const { registerValidation, loginValidation, forgotPasswordValidation, resetPasswordValidation} = require('../models/Validations/User');
 const userType = require('../models/UserType');
 const { authLogin, checkuserExists,createRegisterEmail,getHashedPassword, ValidatePhone, verifyOtp } = require('../repositories/userRepo');
 const {userEvent}= require('../Events/userEvents');
@@ -11,8 +11,8 @@ var moment = require('moment');
 const now = moment().format();
 const expiry = moment().add('60','s').format();
 const getLocation = require('../functions/geoip');
-var useragent = require('express-useragent');
-
+const useragent = require('express-useragent');
+const config = require('../functions/config');
 
 // Register New User
 router.post('/register',[registerValidation,checkuserExists,useragent.express()], async (req, res) => {
@@ -109,14 +109,15 @@ router.post('/resetpassword',[forgotPasswordValidation,ValidatePhone], async (re
         date : now,
         expiry: expiry
      };
+
     await PasswordReset.findOneAndUpdate({user:res.datas._id},respass,{upsert:true}).then(response=>{
        
             //userEvent.emit('sendPasswordResetCode',res.datas.phone_number,'Your OTP is '+respass.code);
             res.status(200).json({
                 message : "OTP Successfuly Sent",
                 data: {
-                    valid: 60,
-                    resend :45,
+                    valid: config.otpexpiry,
+                    resend :config.otpresendtimedelay,
                     reset_id : response._id
                 },
                 next : {
@@ -143,6 +144,7 @@ router.post('/verifyotp',(req,res)=>{
                 error : "Invalid OTP"
             })
         } else {
+            if(data.expiry > now ){
             return res.status(200).json({
                 message : "Verified",
                 data : {
@@ -151,15 +153,30 @@ router.post('/verifyotp',(req,res)=>{
                 next : {
                     message : "Send following Request to Set new Password",
                     type : "POST",
-                    url : 'http://'+req.headers.host+'/user/changepassword',
+                    url : 'http://'+req.headers.host+'/user/resetpassword',
                     params : {
-                        "user_id": "String",
-                        "password" : "String",
-                        "confirm_password" : "String"
+                        "phone_number": "String"
 
                     }
                 }
             })
+        } else {
+
+            return res.status(400).json({
+                message : "Data Error",
+                error : "OTP Expired",
+                next: {
+                    message : "Send the below Request to get new OTP",
+                    type : 'POST',
+                    url :'http://'+req.headers.host+'/user/verifyotp',
+                    params : {
+                        "reset_id" : "String",
+                        "code" :"String"
+                    }
+                    
+                }
+            })
+        }
 
         }
        
@@ -170,7 +187,7 @@ router.post('/verifyotp',(req,res)=>{
 
 
 //Change Password
-router.post('/changepassword',async (req,res)=> {
+router.post('/changepassword',resetPasswordValidation,async (req,res)=> {
 
     const hasp= await getHashedPassword(req.body.password);
     await User.findOneAndUpdate({_id:req.body.user_id},{password:hasp}).then(data=>{

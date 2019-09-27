@@ -54,7 +54,26 @@ const ForgotPasswordValidation = (req,res,next) => {
     next();
 }
 
+
+const resetPasswordValidation = (req,res,next) => {
+    const schema = Joi.object({
+        user_id: Joi.string().required(),
+        password: Joi.string().min(6).required(),
+        repeat_password: Joi.ref('password'),
+    });
+    const validataionHas = schema.validate(req.body);
+    if (validataionHas.error) {
+        return res.status(400).json({
+            message : vErro,
+            error: validataionHas.error.details[0].message
+        });
+         }
+    next();
+}
+
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.forgotPasswordValidation = ForgotPasswordValidation;
+module.exports.resetPasswordValidation = resetPasswordValidation;
+
 
