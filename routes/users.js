@@ -84,9 +84,22 @@ router.post('/register',[registerValidation,checkuserExists,useragent.express()]
 //Login User
 router.post('/login',[loginValidation,authLogin], async (req, res) => {
     
-    //creat token
-    const token = jwt.sign({ email: req.body.email }, process.env.SECRET);
-    res.header('htapi-token', token).json({
+    /** creat  Admin token */
+    if(res.user_type=='Admin'){ 
+        const token = jwt.sign({ email: req.body.email }, process.env.SECRET);
+        res.header('ht-admin-token', token).json({
+            message : "Admin Login Successful",
+            data : {
+                 access_token: token
+            },
+            meta : {
+                "message" : "use the above token to access admin resources"
+            }
+        });
+    }
+    else {
+        const token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN);
+        res.header('htapi-token', token).json({
         message : "Login Successful",
         data : {
              access_token: token
@@ -95,6 +108,9 @@ router.post('/login',[loginValidation,authLogin], async (req, res) => {
             "message" : "use the above token to access private resources"
         }
     });
+    }
+    
+    
 
 });
 

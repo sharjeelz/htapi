@@ -17,7 +17,9 @@ const authLogin = async (req, res, next) => {
 
     //check if user with this email  exists and active
     try {
-        const user = await User.findOne({ email: req.body.email, status: 1 });
+        const user = await User.findOne({ email: req.body.email, status: 1 })
+        .select('password utype')
+        .populate('utype', 'utype');
         if (!user) {
             return res.status(400).json({
                 message : dError,
@@ -26,6 +28,7 @@ const authLogin = async (req, res, next) => {
         }
         else {
             const validPassword = await bcrypt.compare(req.body.password, user.password);
+            res.user_type = user.utype.utype;
             if (!validPassword) {
                 return res.status(400).json({
                     message : dError,

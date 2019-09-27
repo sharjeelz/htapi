@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 const cors = require('cors');
-const adminAuth = require('./routes/verfiy');
+const {adminAuth,userAuth} = require('./routes/verfiy');
 const JsonFind = require('json-find');
 
 
@@ -32,7 +32,7 @@ const postRoutes = require('./routes/posts');
 
 //Use Middleware
 app.use('/user',UserRoutes);
-app.use('/post',postRoutes);
+app.use('/post',userAuth,postRoutes);
 app.use('/admin',adminAuth,adminRoutes);
 
 
