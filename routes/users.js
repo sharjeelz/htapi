@@ -14,10 +14,12 @@ const getLocation = require('../functions/geoip');
 const useragent = require('express-useragent');
 const config = require('../functions/config');
 
+
 // Register New User
 router.post('/register',[registerValidation,checkuserExists,useragent.express()], async (req, res) => {
         /** Get Location Params : TODO: see how req.ip will return data and then pass it to getLocation */ 
-        const my_location= getLocation(req.ip);
+        
+        let my_location = process.env.ENV=='development' ? getLocation('202.166.163.180') : getLocation(req.ip);
         /** Save the User */
         const newuser = new User({
         first_name: req.body.first_name,
@@ -42,8 +44,8 @@ router.post('/register',[registerValidation,checkuserExists,useragent.express()]
             await newuser
             .save()
             .then(saveduser=>{
-                const data = createRegisterEmail(saveduser);
-                userEvent.emit('sendRegisteremail',data);
+                //const data = createRegisterEmail(saveduser);
+                //userEvent.emit('sendRegisteremail',data);
                 //userEvent.emit('sendRegistersms',saveduser.phone_number,'Welcome to HT'); 
 
                 res.status(201).json({
