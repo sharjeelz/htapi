@@ -1,9 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const Post = require('../models/Post')
+const { createPostValidation, updatePostValidation } = require('../models/Validations/Post')
 
-// Create new post
-router.post('/', async (req, res) => {
+// create new post
+router.post('/', createPostValidation, async (req, res) => {
 
     post = new Post({
         message: req.body.message,
@@ -28,44 +29,95 @@ router.post('/', async (req, res) => {
 })
 
 
-// Get all posts by User
+// get all posts by a user
 
 router.get('/user/:id', (req, res) => {
 
     Post.find({ user: req.params.id })
         .select('date message')
-        .populate('user','first_name last_name')
+        .populate('user', 'first_name last_name')
         .then(posts => {
-            if(posts.length > 0){ 
-            res.status(200).json({
-                message: "All User's Posts retrived Successfully",
-                data: {
-                    count: posts.length,
-                    posts: posts
-                }
-            }) }
+            if (posts.length > 0) {
+                res.status(200).json({
+                    message: "All User's Posts retrived Successfully",
+                    data: {
+                        count: posts.length,
+                        posts: posts
+                    }
+                })
+            }
             else {
                 res.status(200).json({
-                    message : `No Posts Found`
+                    message: `No Posts Found`
                 })
             }
         })
-        
+
 })
 
-// Get post by post id
+// get a post by id
 
 router.get('/:id', (req, res) => {
 
-    Post.find({ _id: req.params.id }).then(posts => {
+    Post.find({ _id: req.params.id })
+        .populate('user', 'first_name last_name')
+        .then(post => {
+            if (post.length > 0) {
+                res.status(200).json({
+                    message: "Post retrived Successfully",
+                    data: {
+                        post: post
+                    }
+                })
+            }
+            else {
+                res.status(200).json({
+                    message: `No Post Found`
+                })
+            }
+        })
+})
+
+// delete a post by id
+
+router.delete('/:id', (req, res) => {
+
+    Post.deleteOne({ _id: req.params.id }).then(data => {
 
         res.status(200).json({
-            message: "Post retrived Successfully",
-            data: {
-                posts: posts
-            }
+            message: "Post Deleted"
+        })
+    }).catch(err => {
+        res.status(400).json({
+            message: "Data Error",
+            error: 'Invalid Post id'
         })
     })
 })
 
+// update a post by id
+
+router.put('/:id', async (req, res) => {
+    const updateOps = {}
+
+    /** {  Request body Sample
+	"data" : [{"prop":"message","value": "yeppi"}]
+    } */
+    for (const ops of req.body.data) {
+        updateOps[ops.prop] = ops.value
+
+    }
+    await Post.updateOne({ _id: req.params.id }, { $set: updateOps })
+    .then(post=>{
+       res.status(200).json({
+           message : "Post Updated"
+       })
+    })
+    .catch(err=>{
+         res.status(400).json({
+            message: "Data Error",
+            error: 'Invalid Post id'
+        })
+    })
+})
 module.exports = router
