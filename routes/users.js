@@ -43,13 +43,13 @@ router.post('/register',[registerValidation,checkuserExists,useragent.express()]
         ],
         others:{agent_data: req.useragent}
        
-    });
+    })
             await newuser
             .save()
             .then(saveduser=>{
-                //const data = createRegisterEmail(saveduser);
-                //userEvent.emit('sendRegisteremail',data);
-                //userEvent.emit('sendRegistersms',saveduser.phone_number,'Welcome to HT'); 
+                //const data = createRegisterEmail(saveduser)
+                //userEvent.emit('sendRegisteremail',data)
+                //userEvent.emit('sendRegistersms',saveduser.phone_number,'Welcome to HT') 
 
                 res.status(201).json({
                     message: "User Created Successfuly",
@@ -73,7 +73,7 @@ router.post('/register',[registerValidation,checkuserExists,useragent.express()]
                             }
                         }
                     }
-                });
+                })
         })
             .catch(err=>{
 
@@ -113,10 +113,7 @@ router.post('/login',[loginValidation,authLogin], async (req, res) => {
         }
     })
     }
-    
-    
-
-});
+})
 
 
 
@@ -130,11 +127,11 @@ router.post('/resetpassword',[forgotPasswordValidation,ValidatePhone], async (re
         code : genOtp(),
         date : now,
         expiry: expiry
-     };
+     }
 
     await PasswordReset.findOneAndUpdate({user:res.datas._id},respass,{upsert:true}).then(response=>{
        
-            //userEvent.emit('sendPasswordResetCode',res.datas.phone_number,'Your OTP is '+respass.code);
+            //userEvent.emit('sendPasswordResetCode',res.datas.phone_number,'Your OTP is '+respass.code)
             res.status(200).json({
                 message : "OTP Successfuly Sent",
                 data: {
@@ -205,7 +202,7 @@ router.post('/verifyotp',(req,res)=>{
     }).catch(err=>{
         console.log(err)
     })
-});
+})
 
 
 //Change Password
@@ -221,7 +218,7 @@ router.post('/changepassword',resetPasswordValidation,async (req,res)=> {
         })
     }).catch(err=>{
         
-        console.log(err);
+        console.log(err)
     })
 
 })

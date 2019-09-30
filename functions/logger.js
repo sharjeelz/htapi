@@ -1,5 +1,5 @@
-var moment = require('moment');
-const now = moment().format();
+var moment = require('moment')
+const now = moment().format()
 class myLogger {
     static userLogger(req, res, next){
         let log = {

@@ -31,7 +31,7 @@ const loginValidation = (req,res,next) => {
         password: Joi.string().min(6).required()
     })
 
-    const validataionHas = schema.validate(req.body);
+    const validataionHas = schema.validate(req.body)
     if (validataionHas.error) {
         return res.status(400).json({
             message : vErro,
@@ -61,7 +61,7 @@ const resetPasswordValidation = (req,res,next) => {
         password: Joi.string().min(6).required(),
         repeat_password: Joi.ref('password'),
     })
-    const validataionHas = schema.validate(req.body);
+    const validataionHas = schema.validate(req.body)
     if (validataionHas.error) {
         return res.status(400).json({
             message : vErro,

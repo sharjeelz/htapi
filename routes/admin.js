@@ -12,7 +12,7 @@ router.put('/user/:id', async (req, res) => {
             error : 'Parameters Missing'
         })
     }
-    const updateOps = {};
+    const updateOps = {}
     for (const ops of req.body) {
         updateOps[ops.prop] = ops.value
 
@@ -23,7 +23,7 @@ router.put('/user/:id', async (req, res) => {
     }).catch(err => {
         res.status(400).send(err)
     })
-});
+})
 
 router.get('/user/list', async (req, res) => {
     await User

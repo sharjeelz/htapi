@@ -48,7 +48,7 @@ const checkEmailPhone = async (req, res, next) => {
     //Get user by Id
     try {
         
-        const emailExists = await User.findOne({$or:[{email: req.body.email},{phone_number:req.body.phone_number}]});
+        const emailExists = await User.findOne({$or:[{email: req.body.email},{phone_number:req.body.phone_number}]})
         if (emailExists) {
             return res.status(400).json({
                 message : dError,
@@ -69,7 +69,7 @@ const createRegisterEmail = (saveduser) => {
     let subject = 'Welcome to Healthtallk.com'
     let email = saveduser.email
     return { body: body, subject: subject, email: email }
-};
+}
 
 
 const validPhone = (req,res,next)=> {
@@ -82,7 +82,7 @@ const validPhone = (req,res,next)=> {
             })
         } else {
              res.datas = data
-            next();
+            next()
         }
     })
     .catch(err=>{
