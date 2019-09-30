@@ -1,17 +1,17 @@
 
-const User = require('../models/User');
-const PasswordReset = require('../models/PasswordReset');
-const bcrypt = require('bcryptjs');
-const dError = 'Data Error';
-const eOpE= 'Password or email is wrong';
-const eE= 'User Already Exists';
-const fNf ='Phone Number Not Found';
+const User = require('../models/User')
+const PasswordReset = require('../models/PasswordReset')
+const bcrypt = require('bcryptjs')
+const dError = 'Data Error'
+const eOpE= 'Password or email is wrong'
+const eE= 'User Already Exists'
+const fNf ='Phone Number Not Found'
 
 const hashedpass = async (password)=> {
  /** hash the password */ 
- const salt = await bcrypt.genSalt(10);
- const hashedpassword = await bcrypt.hash(password, salt);
- return hashedpassword;
+ const salt = await bcrypt.genSalt(10)
+ const hashedpassword = await bcrypt.hash(password, salt)
+ return hashedpassword
 }
 const authLogin = async (req, res, next) => {
 
@@ -19,27 +19,27 @@ const authLogin = async (req, res, next) => {
     try {
         const user = await User.findOne({ email: req.body.email, status: 1 })
         .select('password utype')
-        .populate('utype', 'utype');
+        .populate('utype', 'utype')
         if (!user) {
             return res.status(400).json({
                 message : dError,
                 error: eOpE
-            });
+            })
         }
         else {
-            const validPassword = await bcrypt.compare(req.body.password, user.password);
-            res.user_type = user.utype.utype;
+            const validPassword = await bcrypt.compare(req.body.password, user.password)
+            res.user_type = user.utype.utype
             if (!validPassword) {
                 return res.status(400).json({
                     message : dError,
                     error: eOpE
-                });
+                })
             }
-            next();
+            next()
         }
 
     } catch (err) {
-        console.log(err);
+        console.log(err)
     }
 }
 
@@ -55,17 +55,17 @@ const checkEmailPhone = async (req, res, next) => {
                 error: eE
             })
         } else {
-            next();
+            next()
         }
 
     } catch (err) {
-        console.log(err);
+        console.log(err)
     }
 }
 
 const createRegisterEmail = (saveduser) => {
 
-    let body = `<p><h2>Thank You, ${saveduser.first_name} ${saveduser.last_name} </h2> <hr/><p>We appriciate your effort towards a healthy community</p>`;
+    let body = `<p><h2>Thank You, ${saveduser.first_name} ${saveduser.last_name} </h2> <hr/><p>We appriciate your effort towards a healthy community</p>`
     let subject = 'Welcome to Healthtallk.com'
     let email = saveduser.email
     return { body: body, subject: subject, email: email }
@@ -81,28 +81,28 @@ const validPhone = (req,res,next)=> {
                 error: fNf
             })
         } else {
-             res.datas = data;
+             res.datas = data
             next();
         }
     })
     .catch(err=>{
-        console.log(err);
+        console.log(err)
     })
 
 }
 
 const verifyOtp = (req,res,next)=> {
 
-    console.log(req.body);
+    console.log(req.body)
 }
 
 
 
 
-module.exports.authLogin = authLogin;
-module.exports.checkuserExists = checkEmailPhone;
-module.exports.createRegisterEmail = createRegisterEmail;
-module.exports.getHashedPassword = hashedpass;
-module.exports.ValidatePhone = validPhone;
-module.exports.verifyOtp = verifyOtp;
+module.exports.authLogin = authLogin
+module.exports.checkuserExists = checkEmailPhone
+module.exports.createRegisterEmail = createRegisterEmail
+module.exports.getHashedPassword = hashedpass
+module.exports.ValidatePhone = validPhone
+module.exports.verifyOtp = verifyOtp
 

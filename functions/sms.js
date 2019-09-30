@@ -1,4 +1,4 @@
-const axios = require("axios");
+const axios = require("axios")
 const sendSMS = (phone,message) => {
   axios({
     "method":"GET",
@@ -12,4 +12,4 @@ const sendSMS = (phone,message) => {
     })
 }
 
-module.exports= sendSMS;
+module.exports= sendSMS

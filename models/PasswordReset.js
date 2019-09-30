@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-var moment = require('moment');
-const now = moment().format();
-const expiry = moment().add('60','s').format();
+const mongoose = require('mongoose')
+var moment = require('moment')
+const now = moment().format()
+const expiry = moment().add('60','s').format()
 
 
 
@@ -12,4 +12,4 @@ const password_resetSchema = mongoose.Schema({
     expiry: {type:String, default: expiry}
 })
 
-module.exports = mongoose.model('reset_password',password_resetSchema);
+module.exports = mongoose.model('reset_password',password_resetSchema)

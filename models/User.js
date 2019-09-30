@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-var moment = require('moment');
-const now = moment().format();
+const mongoose = require('mongoose')
+var moment = require('moment')
+const now = moment().format()
 
 const UserSchema= mongoose.Schema({
 
@@ -44,6 +44,6 @@ const UserSchema= mongoose.Schema({
     utype: { type: mongoose.Schema.Types.ObjectId, ref: 'UserType' },
     location: {type: Array},
     others : {type: Array}
-});
+})
 
-module.exports= mongoose.model('Users',UserSchema);
+module.exports= mongoose.model('Users',UserSchema)

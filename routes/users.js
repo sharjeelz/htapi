@@ -1,25 +1,28 @@
-const express = require('express');
-const router = express.Router();
-const User = require('../models/User');
-const PasswordReset = require('../models/PasswordReset');
-const jwt = require('jsonwebtoken');
-const { registerValidation, loginValidation, forgotPasswordValidation, resetPasswordValidation} = require('../models/Validations/User');
-const userType = require('../models/UserType');
-const { authLogin, checkuserExists,createRegisterEmail,getHashedPassword, ValidatePhone, verifyOtp } = require('../repositories/userRepo');
-const {userEvent}= require('../Events/userEvents');
-var moment = require('moment');
-const now = moment().format();
-const expiry = moment().add('60','s').format();
-const getLocation = require('../functions/geoip');
-const useragent = require('express-useragent');
-const config = require('../functions/config');
+const express = require('express')
+const router = express.Router()
+const User = require('../models/User')
+const PasswordReset = require('../models/PasswordReset')
+const jwt = require('jsonwebtoken')
+const { registerValidation, loginValidation, forgotPasswordValidation, resetPasswordValidation} = require('../models/Validations/User')
+const userType = require('../models/UserType')
+const { authLogin, checkuserExists,createRegisterEmail,getHashedPassword, ValidatePhone, verifyOtp } = require('../repositories/userRepo')
+const {userEvent}= require('../Events/userEvents')
+var moment = require('moment')
+const now = moment().format()
+const expiry = moment().add('60','s').format()
+const getLocation = require('../functions/geoip')
+const useragent = require('express-useragent')
+const config = require('../functions/config')
+const myLogger = require('../functions/logger')
+
+router.use(myLogger.userLogger)
 
 
 // Register New User
 router.post('/register',[registerValidation,checkuserExists,useragent.express()], async (req, res) => {
-        /** Get Location Params : TODO: see how req.ip will return data and then pass it to getLocation */ 
+        /** Get Location  */ 
         
-        let my_location = process.env.ENV=='development' ? getLocation('202.166.163.180') : getLocation(req.ip);
+        let my_location = process.env.ENV=='development' ? getLocation('202.166.163.180') : getLocation(req.ip)
         /** Save the User */
         const newuser = new User({
         first_name: req.body.first_name,
@@ -79,14 +82,14 @@ router.post('/register',[registerValidation,checkuserExists,useragent.express()]
                     error : err.errmsg
                 })
         })
-    });
+    })
 
 //Login User
 router.post('/login',[loginValidation,authLogin], async (req, res) => {
     
     /** creat  Admin token */
     if(res.user_type=='Admin'){ 
-        const token = jwt.sign({ email: req.body.email }, process.env.SECRET);
+        const token = jwt.sign({ email: req.body.email }, process.env.SECRET)
         res.header('ht-admin-token', token).json({
             message : "Admin Login Successful",
             data : {
@@ -95,10 +98,11 @@ router.post('/login',[loginValidation,authLogin], async (req, res) => {
             meta : {
                 "message" : "use the above token to access admin resources"
             }
-        });
+        })
     }
+    /** creat  user token */
     else {
-        const token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN);
+        const token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN)
         res.header('htapi-token', token).json({
         message : "Login Successful",
         data : {
@@ -107,7 +111,7 @@ router.post('/login',[loginValidation,authLogin], async (req, res) => {
         meta : {
             "message" : "use the above token to access private resources"
         }
-    });
+    })
     }
     
     
@@ -148,8 +152,8 @@ router.post('/resetpassword',[forgotPasswordValidation,ValidatePhone], async (re
                     }
                 }
             })
-        });
-    });
+        })
+    })
 
 // verify OTP()
 router.post('/verifyotp',(req,res)=>{
@@ -207,7 +211,7 @@ router.post('/verifyotp',(req,res)=>{
 //Change Password
 router.post('/changepassword',resetPasswordValidation,async (req,res)=> {
 
-    const hasp= await getHashedPassword(req.body.password);
+    const hasp= await getHashedPassword(req.body.password)
     await User.findOneAndUpdate({_id:req.body.user_id},{password:hasp}).then(data=>{
         res.status(200).json({
             message : "Password Changed Successfully",
@@ -220,7 +224,7 @@ router.post('/changepassword',resetPasswordValidation,async (req,res)=> {
         console.log(err);
     })
 
-});
-const genOtp= ()=> {return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1);}
+})
+const genOtp= ()=> {return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1)}
 
-module.exports = router;
+module.exports = router

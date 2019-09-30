@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 
 const UserTypeSchema= mongoose.Schema({
@@ -9,6 +9,6 @@ const UserTypeSchema= mongoose.Schema({
     }
     
    
-});
+})
 
-module.exports= mongoose.model('UserType',UserTypeSchema);
+module.exports= mongoose.model('UserType',UserTypeSchema)

@@ -1,7 +1,7 @@
-const geoip = require('geoip-lite');
+const geoip = require('geoip-lite')
 
 const getLocation = (ip) => {
-    return geoip.lookup(ip);
+    return geoip.lookup(ip)
 }
 
-module.exports = getLocation;
+module.exports = getLocation

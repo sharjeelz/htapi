@@ -5,4 +5,4 @@ const config = {
     otpresendtimedelay :'80'
 }
 
-module.exports = config;
+module.exports = config

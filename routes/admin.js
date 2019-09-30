@@ -1,7 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const UserType = require('../models/UserType');
-const User = require('../models/User');
+const express = require('express')
+const router = express.Router()
+const UserType = require('../models/UserType')
+const User = require('../models/User')
 
 
 router.put('/user/:id', async (req, res) => {
@@ -14,14 +14,14 @@ router.put('/user/:id', async (req, res) => {
     }
     const updateOps = {};
     for (const ops of req.body) {
-        updateOps[ops.prop] = ops.value;
+        updateOps[ops.prop] = ops.value
 
     }
 
     await User.updateOne({ _id: req.params.id }, { $set: updateOps }).then(() => {
-        res.status(200).json({ message: `Document ID ${req.params.id} updated` });
+        res.status(200).json({ message: `Document ID ${req.params.id} updated` })
     }).catch(err => {
-        res.status(400).send(err);
+        res.status(400).send(err)
     })
 });
 
@@ -32,9 +32,9 @@ router.get('/user/list', async (req, res) => {
         .select('first_name last_name email phone_number date location')
         .populate('utype', 'utype')
         .then(data => {
-            res.send(data);
+            res.send(data)
         }).catch(err => {
-            console.log(err);
+            console.log(err)
         });
 });
 
@@ -51,8 +51,8 @@ router.get('/migrate', async (req, res) => {
         utype: 'Public'
     });
 
-    await utype2.save();
+    await utype2.save()
 
 });
 
-module.exports = router;
+module.exports = router

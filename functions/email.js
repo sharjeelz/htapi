@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer')
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
           user: 'szubair01@gmail.com',
           pass: 'eotjuiqhdworoeav'
         }
-      });
+      })
       
     async function sendEmail   (data){
         const mailOptions = {
@@ -14,15 +14,15 @@ const nodemailer = require('nodemailer');
             to: data.email,
             subject: data.subject,
             html: data.body
-            };
+            }
     try {
         
-        await transporter.sendMail(mailOptions);
+        await transporter.sendMail(mailOptions)
         console.log('Email Sent')
         
     } catch (error) {
      
-        console.log(error);
+        console.log(error)
     }
       
         
@@ -30,4 +30,4 @@ const nodemailer = require('nodemailer');
 }
 
 
-module.exports= sendEmail;
+module.exports= sendEmail
