@@ -3,26 +3,26 @@ const User = require('../models/User')
 const PasswordReset = require('../models/PasswordReset')
 const bcrypt = require('bcryptjs')
 const dError = 'Data Error'
-const eOpE= 'Password or email is wrong'
-const eE= 'User Already Exists'
-const fNf ='Phone Number Not Found'
+const eOpE = 'Password or email is wrong'
+const eE = 'User Already Exists'
+const fNf = 'Phone Number Not Found'
 
-const hashedpass = async (password)=> {
- /** hash the password */ 
- const salt = await bcrypt.genSalt(10)
- const hashedpassword = await bcrypt.hash(password, salt)
- return hashedpassword
+const hashedpass = async (password) => {
+    /** hash the password */
+    const salt = await bcrypt.genSalt(10)
+    const hashedpassword = await bcrypt.hash(password, salt)
+    return hashedpassword
 }
 const authLogin = async (req, res, next) => {
 
     //check if user with this email  exists and active
     try {
         const user = await User.findOne({ email: req.body.email, status: 1 })
-        .select('password utype')
-        .populate('utype', 'utype')
+            .select('password utype')
+            .populate('utype', 'utype')
         if (!user) {
             return res.status(400).json({
-                message : dError,
+                message: dError,
                 error: eOpE
             })
         }
@@ -31,7 +31,7 @@ const authLogin = async (req, res, next) => {
             res.user_type = user.utype.utype
             if (!validPassword) {
                 return res.status(400).json({
-                    message : dError,
+                    message: dError,
                     error: eOpE
                 })
             }
@@ -47,11 +47,11 @@ const authLogin = async (req, res, next) => {
 const checkEmailPhone = async (req, res, next) => {
     //Get user by Id
     try {
-        
-        const emailExists = await User.findOne({$or:[{email: req.body.email},{phone_number:req.body.phone_number}]})
+
+        const emailExists = await User.findOne({ $or: [{ email: req.body.email }, { phone_number: req.body.phone_number }] })
         if (emailExists) {
             return res.status(400).json({
-                message : dError,
+                message: dError,
                 error: eE
             })
         } else {
@@ -72,26 +72,26 @@ const createRegisterEmail = (saveduser) => {
 }
 
 
-const validPhone = (req,res,next)=> {
+const validPhone = (req, res, next) => {
 
-    User.findOne({phone_number:req.body.phone_number}).then(data=> {
-        if(!data) {
+    User.findOne({ phone_number: req.body.phone_number }).then(data => {
+        if (!data) {
             return res.status(404).json({
-                message : dError,
+                message: dError,
                 error: fNf
             })
         } else {
-             res.datas = data
+            res.datas = data
             next()
         }
     })
-    .catch(err=>{
-        console.log(err)
-    })
+        .catch(err => {
+            console.log(err)
+        })
 
 }
 
-const verifyOtp = (req,res,next)=> {
+const verifyOtp = (req, res, next) => {
 
     console.log(req.body)
 }

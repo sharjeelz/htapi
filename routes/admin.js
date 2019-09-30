@@ -6,10 +6,10 @@ const User = require('../models/User')
 
 router.put('/user/:id', async (req, res) => {
 
-    if(!req.body){
+    if (!req.body) {
         return res.status(400).json({
             message: 'Validataion Error',
-            error : 'Parameters Missing'
+            error: 'Parameters Missing'
         })
     }
     const updateOps = {}
@@ -28,31 +28,31 @@ router.put('/user/:id', async (req, res) => {
 router.get('/user/list', async (req, res) => {
     await User
         .find({})
-         .sort([['date', -1]])
+        .sort([['date', -1]])
         .select('first_name last_name email phone_number date location')
         .populate('utype', 'utype')
         .then(data => {
             res.send(data)
         }).catch(err => {
             console.log(err)
-        });
-});
+        })
+})
 
 //Migrations
 router.get('/migrate', async (req, res) => {
 
     utype1 = new UserType({
         utype: 'Admin'
-    });
+    })
 
-    await utype1.save();
+    await utype1.save()
 
     utype2 = new UserType({
         utype: 'Public'
-    });
+    })
 
     await utype2.save()
 
-});
+})
 
 module.exports = router

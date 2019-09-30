@@ -46,7 +46,7 @@ const postRoutes = require('./routes/posts')
 
 //Use Middleware
 app.use('/user',UserRoutes)
-app.use('/post',userAuth,postRoutes)
+app.use('/post',postRoutes)
 app.use('/admin',adminAuth,adminRoutes)
 
 
