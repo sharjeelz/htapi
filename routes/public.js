@@ -1,34 +1,46 @@
 const express = require('express')
 const router = express.Router()
 const Post = require('../models/Post')
+const Comment = require('../models/Comment')
 const config = require('../functions/config')
 
 //get all posts
 
-router.get('/:p(\d+)?', (req, res) => {
+router.get('/:p(\d+)?', async (req, res) => {
 
-    const resPerPage= config.resPerPage;
+    const resPerPage = config.resPerPage
     const page = req.params.p
+    let post_comment = [];
+    let data = [];
     Post.find({})
-    .sort({ date: -1 })
-    .populate('user', 'first_name last_name')
-    .populate('posttype', 'ptype')
-    .skip((resPerPage * page) - resPerPage)
-    .limit(resPerPage)
-    .then(posts => {
-        res.status(200).json({
-            message: "Retrieved",
-            data: {
-                count:posts.length,
-                posts: posts
-            }
+        .select('data message user posttype')
+        .sort({ date: -1 })
+        .populate('user', 'first_name last_name')
+        .populate('posttype', 'ptype')
+        .populate({path:'comments'})
+        .skip((resPerPage * page) - resPerPage)
+        .limit(resPerPage)
+        .lean()
+        .then(posts => {
+            var results = [];
+           res.status(200).json({
+               posts: posts.map(post=>{
+               Comment.find({post:post._id}).then(comment=>{
+               
+             
+                   
+                }).catch(err=>{console.log(err)});
+               // console.log(post_comment);
+                
+               })
+               
+           })
+        }).catch(err => {
+            res.status(400).json({
+                message: "Data Error",
+                error: err
+            })
         })
-    }).catch(err => {
-        res.status(400).json({
-            message: "Data Error",
-            error: err
-        })
-    })
 
 })
 
@@ -36,34 +48,34 @@ router.get('/:p(\d+)?', (req, res) => {
 //find in  all posts
 
 router.get('/find', (req, res) => {
-   /** find?q=help */
+    /** find?q=help */
     regex = new RegExp(escapeRegex(req.query.q), 'gi');
-    const resPerPage= config.resPerPage;
+    const resPerPage = config.resPerPage;
     const page = req.params.p
-    Post.find({message:regex})
-    .sort({ date: -1 })
-    .populate('user', 'first_name last_name')
-    .populate('posttype', 'ptype')
-    .skip((resPerPage * page) - resPerPage)
-    .limit(resPerPage)
-    .then(posts => {
-        res.status(200).json({
-            message: "Searh Results",
-            data: {
-                count:posts.length,
-                posts: posts
-            }
+    Post.find({ message: regex })
+        .sort({ date: -1 })
+        .populate('user', 'first_name last_name')
+        .populate('posttype', 'ptype')
+        .skip((resPerPage * page) - resPerPage)
+        .limit(resPerPage)
+        .then(posts => {
+            res.status(200).json({
+                message: "Searh Results",
+                data: {
+                    count: posts.length,
+                    posts: posts
+                }
+            })
+        }).catch(err => {
+            res.status(400).json({
+                message: "Data Error",
+                error: err
+            })
         })
-    }).catch(err => {
-        res.status(400).json({
-            message: "Data Error",
-            error: err
-        })
-    })
 
 })
 
 const escapeRegex = (string) => {
     return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-  };
+};
 module.exports = router

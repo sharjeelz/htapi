@@ -4,8 +4,7 @@ const Post = require('../models/Post')
 const PostType = require('../models/PostType');
 const { createPostValidation } = require('../models/Validations/Post')
 const { userExists } = require('../repositories/userRepo')
-
-
+const Comment = require('../models/Comment')
 // create new post
 router.post('/', [createPostValidation, userExists], async (req, res) => {
 
@@ -127,5 +126,22 @@ router.put('/:id', async (req, res) => {
                 error: 'Invalid Post id'
             })
         })
+})
+
+// comment on post
+
+router.post('/comment',(req,res)=>{
+
+    comment = new Comment({
+        comment:req.body.comment,
+        user: req.body.user,
+        post:req.body.post
+    })
+    comment.save().then(data=>{
+
+    }).catch(err=>{
+        console.log(err);
+    })
+    
 })
 module.exports = router
