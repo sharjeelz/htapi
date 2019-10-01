@@ -63,17 +63,21 @@ router.get('/user/:id', (req, res) => {
 
 // get a post by id
 
-router.get('/:id', (req, res) => {
+router.get('/:id',(req, res) => {
 
     Post.find({ _id: req.params.id })
         .populate('user', 'first_name last_name')
         .populate('posttype', 'ptype')
-        .then(post => {
+        .then( async post => {
             if (post.length > 0) {
+                
+                const post_comments= await Comment.find({post:req.params.id});
+                console.log(post_comments); 
                 res.status(200).json({
                     message: "Post retrived Successfully",
                     data: {
-                        post: post
+                        post: post,
+                        comments: post_comments
                     }
                 })
             }
@@ -139,8 +143,15 @@ router.post('/comment',(req,res)=>{
     })
     comment.save().then(data=>{
 
+        res.status(201).json({
+            message: "Comment Saved",
+        })
+
     }).catch(err=>{
-        console.log(err);
+        res.status(400).json({
+            message: "Data Error",
+            error: err
+        })
     })
     
 })
