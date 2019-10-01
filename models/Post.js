@@ -10,6 +10,7 @@ const postSchema = mongoose.Schema({
     },
     date: { type: String , default: now},
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    posttype: { type: mongoose.Schema.Types.ObjectId, ref: 'PostType' }
+    posttype: { type: mongoose.Schema.Types.ObjectId, ref: 'PostType' },
+    comments:[ {type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}]
 })
 module.exports = mongoose.model('Post', postSchema)

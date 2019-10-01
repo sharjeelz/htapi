@@ -12,29 +12,28 @@ router.get('/:p(\d+)?', async (req, res) => {
     const page = req.params.p
     let post_comment = [];
     let data = [];
+
     Post.find({})
         .select('data message user posttype')
         .sort({ date: -1 })
         .populate('user', 'first_name last_name')
         .populate('posttype', 'ptype')
-        .populate({path:'comments'})
+        .populate({
+            path: 'comments',
+            select: 'comment date',
+            populate: {
+                path: 'user',
+                select: 'first_name last_name pic',
+            }
+        })
         .skip((resPerPage * page) - resPerPage)
         .limit(resPerPage)
         .lean()
         .then(posts => {
-            var results = [];
-           res.status(200).json({
-               posts: posts.map(post=>{
-               Comment.find({post:post._id}).then(comment=>{
-               
-             
-                   
-                }).catch(err=>{console.log(err)});
-               // console.log(post_comment);
-                
-               })
-               
-           })
+            res.status(200).json({
+                posts: posts
+
+            })
         }).catch(err => {
             res.status(400).json({
                 message: "Data Error",
