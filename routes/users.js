@@ -42,9 +42,9 @@ router.post('/register', [registerValidation, checkuserExists, useragent.express
             { timezone: my_location.timezone }
 
         ],
-        others: { agent_data: req.useragent },
+       // others: { agent_data: req.useragent },
         /** TODO: Need to find out a way to upload pic either from node or from front end using aws.. or others */
-        pic : 'http://portfolio.sharjeelz.com/wp-content/uploads/2018/12/12193500_1637646209856358_6420604699381433064_n.jpg'
+        pic: 'http://portfolio.sharjeelz.com/wp-content/uploads/2018/12/12193500_1637646209856358_6420604699381433064_n.jpg'
 
     })
     await newuser

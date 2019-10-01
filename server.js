@@ -9,6 +9,7 @@ const {adminAuth,userAuth} = require('./routes/verfiy')
 const getLocation = require('./functions/geoip')
 
 
+
 //connect server and  DB
 app.listen(process.env.PORT, () => {
     console.log(`Server Running on port : ${process.env.PORT}`);
@@ -43,11 +44,13 @@ app.get('/',(req,res,next)=>{
 const UserRoutes = require('./routes/users')
 const adminRoutes = require('./routes/admin')
 const postRoutes = require('./routes/posts')
+const publicRoutes = require('./routes/public')
 
 //Use Middleware
 app.use('/user',UserRoutes)
 app.use('/post',postRoutes)
 app.use('/admin',adminAuth,adminRoutes)
+app.use('/public',publicRoutes)
 
 
 

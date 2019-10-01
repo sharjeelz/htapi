@@ -62,18 +62,18 @@ router.get('/migrate/usertype', async (req, res) => {
 
 router.get('/migrate/posttype', async (req, res) => {
 
-    ptype= new PostType({
-        ptype:'General'
+    ptype = new PostType({
+        ptype: 'General'
     })
     await ptype.save();
 
-    ptype1= new PostType({
-        ptype:'Emergency'
+    ptype1 = new PostType({
+        ptype: 'Emergency'
     })
     await ptype1.save();
 
-    ptype2= new PostType({
-        ptype:'Donation'
+    ptype2 = new PostType({
+        ptype: 'Donation'
     })
     await ptype2.save();
 

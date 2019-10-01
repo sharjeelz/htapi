@@ -7,7 +7,7 @@ const { userExists } = require('../repositories/userRepo')
 
 
 // create new post
-router.post('/', [createPostValidation,userExists], async (req, res) => {
+router.post('/', [createPostValidation, userExists], async (req, res) => {
 
     const post_types = { G: 'General', E: 'Emergency', D: 'Donation' }
     post = new Post({
@@ -42,7 +42,7 @@ router.get('/user/:id', (req, res) => {
     Post.find({ user: req.params.id })
         .select('date message')
         .populate('user', 'first_name last_name')
-        .populate('posttype','ptype')
+        .populate('posttype', 'ptype')
         .then(posts => {
             if (posts.length > 0) {
                 res.status(200).json({
@@ -68,7 +68,7 @@ router.get('/:id', (req, res) => {
 
     Post.find({ _id: req.params.id })
         .populate('user', 'first_name last_name')
-        .populate('posttype','ptype')
+        .populate('posttype', 'ptype')
         .then(post => {
             if (post.length > 0) {
                 res.status(200).json({
