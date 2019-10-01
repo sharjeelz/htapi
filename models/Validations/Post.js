@@ -6,7 +6,8 @@ const createPost  = (req,res,next)=> {
 
     const schema = Joi.object({
         message: Joi.string().required(),
-        user: Joi.string().required()
+        user: Joi.string().required(),
+        ptype: Joi.string().required()
     })
     const validataionHas = schema.validate(req.body)
     if (validataionHas.error) {

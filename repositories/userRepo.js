@@ -6,6 +6,7 @@ const dError = 'Data Error'
 const eOpE = 'Password or email is wrong'
 const eE = 'User Already Exists'
 const fNf = 'Phone Number Not Found'
+const uNf = 'User Not Found'
 
 const hashedpass = async (password) => {
     /** hash the password */
@@ -45,7 +46,6 @@ const authLogin = async (req, res, next) => {
 
 
 const checkEmailPhone = async (req, res, next) => {
-    //Get user by Id
     try {
 
         const emailExists = await User.findOne({ $or: [{ email: req.body.email }, { phone_number: req.body.phone_number }] })
@@ -72,15 +72,16 @@ const createRegisterEmail = (saveduser) => {
 }
 
 
-const validPhone = (req, res, next) => {
+const validPhone = async (req, res, next) => {
 
-    User.findOne({ phone_number: req.body.phone_number }).then(data => {
+    await User.findOne({ phone_number: req.body.phone_number }).then(data => {
         if (!data) {
-            return res.status(404).json({
+            return res.status(400).json({
                 message: dError,
                 error: fNf
             })
         } else {
+            console.log(data);
             res.datas = data
             next()
         }
@@ -91,9 +92,19 @@ const validPhone = (req, res, next) => {
 
 }
 
-const verifyOtp = (req, res, next) => {
+const userExists =  (req, res, next) => {
 
-    console.log(req.body)
+ User.findById(req.body.user).then(user=>{
+    if(!user) {
+        return res.status(400).json({
+            message: dError,
+            error:  uNf
+        })
+    }
+    next()
+}).catch(err=>{
+    console.log(err)
+})
 }
 
 
@@ -104,5 +115,5 @@ module.exports.checkuserExists = checkEmailPhone
 module.exports.createRegisterEmail = createRegisterEmail
 module.exports.getHashedPassword = hashedpass
 module.exports.ValidatePhone = validPhone
-module.exports.verifyOtp = verifyOtp
+module.exports.userExists = userExists
 

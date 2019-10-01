@@ -65,15 +65,6 @@ router.post('/register', [registerValidation, checkuserExists, useragent.express
                         phone_number: saveduser.phone_number,
                         utype: saveduser.utype,
                         date: saveduser.date
-                    },
-                    next: {
-                        message: "Send the following Request to Login",
-                        type: 'POST',
-                        url: 'http://' + req.headers.host + '/user/login',
-                        params: {
-                            "email": "String",
-                            "password": "String"
-                        }
                     }
                 }
             })
@@ -92,7 +83,7 @@ router.post('/login', [loginValidation, authLogin], async (req, res) => {
 
     /** creat  Admin token */
     if (res.user_type == 'Admin') {
-        const token = jwt.sign({ email: req.body.email }, process.env.SECRET)
+        const token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN)
         res.header('ht-admin-token', token).json({
             message: "Admin Login Successful",
             data: {
@@ -105,7 +96,7 @@ router.post('/login', [loginValidation, authLogin], async (req, res) => {
     }
     /** creat  user token */
     else {
-        const token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN)
+        const token = jwt.sign({ email: req.body.email }, process.env.SECRET)
         res.header('htapi-token', token).json({
             message: "Login Successful",
             data: {
@@ -141,15 +132,6 @@ router.post('/resetpassword', [forgotPasswordValidation, ValidatePhone], async (
                 valid: config.otpexpiry,
                 resend: config.otpresendtimedelay,
                 reset_id: response._id
-            },
-            next: {
-                message: "Send the below Request to Verify OTP",
-                type: 'POST',
-                url: 'http://' + req.headers.host + '/user/verifyotp',
-                params: {
-                    "reset_id": "String",
-                    "code": "String"
-                }
             }
         })
     })
@@ -171,32 +153,13 @@ router.post('/verifyotp', (req, res) => {
                     message: "Verified",
                     data: {
                         user_id: data.user
-                    },
-                    next: {
-                        message: "Send following Request to Set new Password",
-                        type: "POST",
-                        url: 'http://' + req.headers.host + '/user/resetpassword',
-                        params: {
-                            "phone_number": "String"
-
-                        }
                     }
                 })
             } else {
 
                 return res.status(400).json({
                     message: "Data Error",
-                    error: "OTP Expired",
-                    next: {
-                        message: "Send the below Request to get new OTP",
-                        type: 'POST',
-                        url: 'http://' + req.headers.host + '/user/verifyotp',
-                        params: {
-                            "reset_id": "String",
-                            "code": "String"
-                        }
-
-                    }
+                    error: "OTP Expired"
                 })
             }
 

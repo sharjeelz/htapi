@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const UserType = require('../models/UserType')
+const PostType = require('../models/PostType')
 const User = require('../models/User')
 
 
@@ -39,7 +40,7 @@ router.get('/user/list', async (req, res) => {
 })
 
 //Migrations
-router.get('/migrate', async (req, res) => {
+router.get('/migrate/usertype', async (req, res) => {
 
     utype1 = new UserType({
         utype: 'Admin'
@@ -53,6 +54,33 @@ router.get('/migrate', async (req, res) => {
 
     await utype2.save()
 
+    res.status(201).json({
+        message: "Migration Ran"
+    })
+
 })
+
+router.get('/migrate/posttype', async (req, res) => {
+
+    ptype= new PostType({
+        ptype:'General'
+    })
+    await ptype.save();
+
+    ptype1= new PostType({
+        ptype:'Emergency'
+    })
+    await ptype1.save();
+
+    ptype2= new PostType({
+        ptype:'Donation'
+    })
+    await ptype2.save();
+
+    res.status(201).json({
+        message: "Migration Ran"
+    })
+
+});
 
 module.exports = router
