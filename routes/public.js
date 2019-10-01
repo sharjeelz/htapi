@@ -54,7 +54,14 @@ router.get('/find', (req, res) => {
     Post.find({ message: regex })
         .sort({ date: -1 })
         .populate('user', 'first_name last_name')
-        .populate('posttype', 'ptype')
+        .populate('posttype', 'ptype').populate({
+            path: 'comments',
+            select: 'comment date',
+            populate: {
+                path: 'user',
+                select: 'first_name last_name pic',
+            }
+        })
         .skip((resPerPage * page) - resPerPage)
         .limit(resPerPage)
         .then(posts => {
