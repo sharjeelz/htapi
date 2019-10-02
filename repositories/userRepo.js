@@ -95,15 +95,15 @@ const validPhone = async (req, res, next) => {
 const userExists = (req, res, next) => {
 
     User.findById(req.body.user).then(user => {
-        if (!user) {
-            return res.status(400).json({
-                message: dError,
-                error: uNf
-            })
+        if (user) {
+            next()
         }
-        next()
+        
     }).catch(err => {
-        console.log(err)
+        return res.status(400).json({
+            message: dError,
+            error: uNf
+        })
     })
 }
 

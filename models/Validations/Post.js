@@ -1,11 +1,12 @@
 const Joi = require('@hapi/joi')
 const vErro = 'Validation Error'
+const config = require('../../functions/config')
 
 
 const createPost  = (req,res,next)=> {
 
     const schema = Joi.object({
-        message: Joi.string().required(),
+        message: Joi.string().required().max(config.commentlength),
         user: Joi.string().required(),
         ptype: Joi.string().required()
     })
@@ -35,10 +36,12 @@ const updatePost  = (req,res,next)=> {
     next()
 }
 
-const idValidation  = (req,res,next)=> {
+const commentOnPost  = (req,res,next)=> {
 
     const schema = Joi.object({
-        id: Joi.string().required()
+        comment: Joi.string().required().max(config.commentlength),
+        user:Joi.string().required(),
+        post: Joi.string().required()
     })
     const validataionHas = schema.validate(req.body)
     if (validataionHas.error) {
@@ -52,6 +55,7 @@ const idValidation  = (req,res,next)=> {
 
 module.exports.createPostValidation = createPost
 module.exports.updatePostValidation = updatePost
+module.exports.commentValidation = commentOnPost
 
 
 
