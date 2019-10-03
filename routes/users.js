@@ -14,6 +14,8 @@ const getLocation = require('../functions/geoip')
 const useragent = require('express-useragent')
 const config = require('../functions/config')
 const myLogger = require('../functions/logger')
+var multer  = require('multer')
+var upload = multer({ dest: 'uploads/profile' }).single('img')
 
 /** log User Module Actions : (WIP) */
 //router.use(myLogger.userLogger)
@@ -188,6 +190,21 @@ router.post('/changepassword', resetPasswordValidation, async (req, res) => {
     })
 
 })
+
+// add profile image
+router.post('/image',(req,res)=>{
+  
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+          console.log(err);
+        } else if (err) {
+            console.log(err);
+        }
+     
+        console.log(req.file);
+      })
+})
+
 const genOtp = () => { return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) }
 
 module.exports = router
