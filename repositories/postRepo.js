@@ -4,7 +4,7 @@ const Post = require('../models/Post')
 const dError = 'Data Error'
 const iP = 'Invalid Post ID'
 const Spam = require('../models/Spam')
-
+const myLogger = require('../functions/logger')
 const checkPost = async (req, res, next) => {
     try {
 
@@ -15,6 +15,7 @@ const checkPost = async (req, res, next) => {
 
         }
     } catch (err) {
+       
         return res.status(400).json({
             message: dError,
             error: iP
@@ -22,10 +23,11 @@ const checkPost = async (req, res, next) => {
     }
 }
 
-const isSpam = async (req, res, next) => {
+const isSpam = async  (req, res, next) => {
 
     Spam.find({}).lean().select('-_id word').then(data => {
 
+        
         let result = data.map(a => a.word)
         const replace = result.join('|')
         const new_expression = new RegExp(replace, "g")
@@ -34,9 +36,8 @@ const isSpam = async (req, res, next) => {
             next()
         }
         else {
-            return res.status(400).json({
-                message: "Not Allowed Words"
-            })
+            return myLogger.SpamLogger(req, res, next,spam_words)
+            
         }
      }).catch(err => {
         res.json(err)

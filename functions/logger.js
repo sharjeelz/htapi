@@ -12,6 +12,28 @@ class myLogger {
     next()
   }
 
+  static SpamLogger(req, res, next, data) {
+
+    let log = {
+      ip: req.ip,
+      user: req.body.user,
+      data: JSON.stringify(data)
+    }
+
+    console.log(log);
+    // fs.appendFile('SpamLoggers.txt','asd').then(data=>{
+      
+    // }).catch(err=>{
+    //   res.send('sad'+err);
+    // })
+
+    return res.status(400).json({
+      message: "Not Allowed Words, your data may be logged for investigation"
+    })
+
+    
+  }
+
 }
 
 module.exports = myLogger

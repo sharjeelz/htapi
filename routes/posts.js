@@ -135,6 +135,7 @@ router.put('/:id', async (req, res) => {
 
 // comment on post
 
+
 router.post('/comment', [commentValidation,PostExists,userExists,isCommentSpam],(req, res) => {
 
     new_comment = new Comment({
