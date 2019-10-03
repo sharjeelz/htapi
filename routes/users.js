@@ -14,8 +14,9 @@ const getLocation = require('../functions/geoip')
 const useragent = require('express-useragent')
 const config = require('../functions/config')
 const myLogger = require('../functions/logger')
-var multer  = require('multer')
+var multer = require('multer')
 var upload = multer({ dest: 'uploads/profile' }).single('img')
+const Profile = require('../models/Profile')
 
 /** log User Module Actions : (WIP) */
 //router.use(myLogger.userLogger)
@@ -44,9 +45,10 @@ router.post('/register', [registerValidation, checkuserExists, useragent.express
             { timezone: my_location.timezone }
 
         ],
-       // others: { agent_data: req.useragent },
+        // others: { agent_data: req.useragent },
         /** TODO: Need to find out a way to upload pic either from node or from front end using aws.. or others */
-        pic: 'http://portfolio.sharjeelz.com/wp-content/uploads/2018/12/12193500_1637646209856358_6420604699381433064_n.jpg'
+        pic: 'http://portfolio.sharjeelz.com/wp-content/uploads/2018/12/12193500_1637646209856358_6420604699381433064_n.jpg',
+        profile: await new Profile({}).save()
 
     })
     await newuser
@@ -115,9 +117,6 @@ router.post('/login', [loginValidation, authLogin], async (req, res) => {
 
 //Forgot Password
 router.post('/resetpassword', [forgotPasswordValidation, ValidatePhone], async (req, res) => {
-
-    //save in data base
-
     const respass = {
         user: res.datas._id,
         code: genOtp(),
@@ -192,17 +191,67 @@ router.post('/changepassword', resetPasswordValidation, async (req, res) => {
 })
 
 // add profile image
-router.post('/image',(req,res)=>{
-  
+router.post('/image', (req, res) => {
+
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError) {
-          console.log(err);
+            console.log(err);
         } else if (err) {
             console.log(err);
         }
-     
+
         console.log(req.file);
-      })
+    })
+})
+
+// create profile
+router.post('/profile', [checkuserExists], (req, res) => {
+
+    /** 
+     {  
+	"data" : [{"prop":"disease","value": ["asthama","polio"]}]
+    }
+     */
+    const updateOps = {}
+    for (const ops of req.body.data) {
+        updateOps[ops.prop] = ops.value
+    }
+
+
+
+    User.findOne({ _id: req.body.user }).then(data => {
+        Profile.findOneAndUpdate({_id:data.profile}, { $push: { disease: updateOps.disease } }).then(data => {
+            return res.status(200).json({
+                message: "Profile Updated"
+            })
+        }).catch(err => {
+            console.log(err);
+        })
+
+    }).catch(err => {
+        console.log(err);
+    })
+
+    return;
+
+
+})
+
+//get user profile
+
+router.get('/profile', (req, res) => {
+    User.findOne({ _id: req.params.user }).then(data => {
+        Profile.findByIdAndUpdate(data.profile, { $push: { disease: updateOps } }).then(data => {
+            return res.status(200).json({
+                message: "Profile Updated"
+            })
+        }).catch(err => {
+            console.log(err);
+        })
+
+    }).catch(err => {
+        console.log(err);
+    })
 })
 
 const genOtp = () => { return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) }

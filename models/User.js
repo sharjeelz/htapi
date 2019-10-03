@@ -44,7 +44,8 @@ const UserSchema = mongoose.Schema({
     utype: { type: mongoose.Schema.Types.ObjectId, ref: 'UserType' },
     location: { type: Array },
     others: { type: Array },
-    pic : {type: String}
+    pic : {type: String},
+    profile:{ type: mongoose.Schema.Types.ObjectId, ref: 'profile' }
 })
 
 module.exports = mongoose.model('User', UserSchema)

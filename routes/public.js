@@ -6,10 +6,11 @@ const config = require('../functions/config')
 
 //get all posts
 
-router.get('/:p(\d+)?', async (req, res) => {
+router.get('/:p?', async (req, res) => {
 
     const resPerPage = config.postresperpage
     const page = req.params.p
+    
     Post.find({})
         .select('data message user posttype')
         .sort('-date')
@@ -30,6 +31,7 @@ router.get('/:p(\d+)?', async (req, res) => {
         .lean()
         .then(posts => {
             res.status(200).json({
+                count: posts.length,
                 posts: posts
 
             })
@@ -53,6 +55,7 @@ router.get('/find', (req, res) => {
     Post.find({ message: regex })
         .sort('-date')
         .populate('user', 'first_name last_name')
+        .populate('profile')
         .populate('posttype', 'ptype').populate({
             path: 'comments',
             select: 'comment date',
