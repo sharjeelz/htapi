@@ -4,7 +4,7 @@ const Post = require('../models/Post')
 const PostType = require('../models/PostType');
 const { createPostValidation , commentValidation} = require('../models/Validations/Post')
 const { userExists } = require('../repositories/userRepo');
-const { PostExists } = require('../repositories/postRepo');
+const { PostExists, isCommentSpam } = require('../repositories/postRepo');
 const Comment = require('../models/Comment')
 // create new post
 router.post('/', [createPostValidation, userExists], async (req, res) => {
@@ -135,7 +135,7 @@ router.put('/:id', async (req, res) => {
 
 // comment on post
 
-router.post('/comment', [commentValidation,PostExists,userExists],(req, res) => {
+router.post('/comment', [commentValidation,PostExists,userExists,isCommentSpam],(req, res) => {
 
     new_comment = new Comment({
         comment: req.body.comment,
