@@ -81,7 +81,6 @@ const validPhone = async (req, res, next) => {
                 error: fNf
             })
         } else {
-            console.log(data);
             res.datas = data
             next()
         }

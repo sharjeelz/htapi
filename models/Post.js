@@ -8,9 +8,30 @@ const postSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    date: { type: String , default: now},
+    createdAt: {
+        type: String,
+        default: now
+    },
+    updatedAt: {
+        type: String,
+    },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     posttype: { type: mongoose.Schema.Types.ObjectId, ref: 'PostType' },
     comments:[ {type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}]
+})
+
+postSchema.pre('findOneAndUpdate', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
+})
+
+postSchema.pre('update', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
+})
+
+postSchema.pre('findByIdAndUpdate', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
 })
 module.exports = mongoose.model('Post', postSchema)

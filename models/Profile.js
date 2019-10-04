@@ -3,29 +3,38 @@ var moment = require('moment')
 const now = moment().format()
 
 const profileSchema = mongoose.Schema({
-    
-    disease : {
+
+    disease: {
         type: Array
     },
-    maritalStatus: {type:String},
+    maritalStatus: { type: String },
     createdAt: {
         type: String,
-        default:now
+        default: now
     },
     updatedAt: {
         type: String,
     }
-    
+
 })
 
 profileSchema.pre('findOneAndUpdate', function (next) {
-    this.update({},{ $set: { updatedAt: now } });
+    this.update({}, { $set: { updatedAt: now } });
     next()
-  })
+})
 
 profileSchema.pre('update', function (next) {
-    this.update({},{ $set: { updatedAt: now } });
+    this.update({}, { $set: { updatedAt: now } });
     next()
-  })
+})
 
-module.exports = mongoose.model('profile',profileSchema);
+profileSchema.pre('findByIdAndUpdate', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
+})
+
+
+
+
+
+module.exports = mongoose.model('profile', profileSchema);

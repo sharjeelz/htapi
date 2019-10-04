@@ -8,7 +8,7 @@ const registerValidation = (req, res, next) => {
         first_name: Joi.string().required(),
         last_name: Joi.string().required(),
         phone_number: Joi.number().required(),
-        email: Joi.string().required().email().max(30),
+        email: Joi.string().required().email().max(40),
         password: Joi.string().min(6).required(),
         repeat_password: Joi.ref('password'),
         gender: Joi.string()

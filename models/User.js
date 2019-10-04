@@ -30,9 +30,12 @@ const UserSchema = mongoose.Schema({
         type: Boolean,
         default: 1
     },
-    date: {
+    createdAt: {
         type: String,
         default: now
+    },
+    updatedAt: {
+        type: String,
     },
     password: {
         type: String,
@@ -46,6 +49,21 @@ const UserSchema = mongoose.Schema({
     others: { type: Array },
     pic : {type: String},
     profile:{ type: mongoose.Schema.Types.ObjectId, ref: 'profile' }
+})
+
+UserSchema.pre('findOneAndUpdate', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
+})
+
+UserSchema.pre('update', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
+})
+
+UserSchema.pre('findByIdAndUpdate', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
 })
 
 module.exports = mongoose.model('User', UserSchema)

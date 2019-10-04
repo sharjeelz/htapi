@@ -11,4 +11,19 @@ const PostTypeSchema = mongoose.Schema({
 
 })
 
+PostTypeSchema.pre('findOneAndUpdate', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
+})
+
+PostTypeSchema.pre('update', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
+})
+
+PostTypeSchema.pre('findByIdAndUpdate', function (next) {
+    this.update({}, { $set: { updatedAt: now } });
+    next()
+})
+
 module.exports = mongoose.model('PostType', PostTypeSchema)

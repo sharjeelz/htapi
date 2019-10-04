@@ -30,8 +30,8 @@ router.put('/user/:id', async (req, res) => {
 router.get('/user/list', async (req, res) => {
     await User
         .find({})
-        .sort({'date': -1})
-        .select('first_name last_name email phone_number date location')
+        .sort({'createdAt': -1})
+        .select('first_name last_name email phone_number createdAt location')
         .populate('utype', 'utype')
         .then(data => {
             res.send(data)
@@ -56,7 +56,7 @@ router.get('/migrate/usertype', async (req, res) => {
     await utype2.save()
 
     res.status(201).json({
-        message: "Migration Ran"
+        message: "user type Migration Ran"
     })
 
 })
@@ -79,7 +79,7 @@ router.get('/migrate/posttype', async (req, res) => {
     await ptype2.save();
 
     res.status(201).json({
-        message: "Migration Ran"
+        message: "post type Migration Ran"
     })
 
 });

@@ -40,7 +40,7 @@ router.post('/', [createPostValidation, userExists], async (req, res) => {
 router.get('/user/:id', (req, res) => {
 
     Post.find({ user: req.params.id })
-        .select('date message')
+        .select('createdAt message')
         .populate('user', 'first_name last_name')
         .populate('posttype', 'ptype')
         .then(posts => {

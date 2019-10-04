@@ -68,7 +68,7 @@ router.post('/register', [registerValidation, checkuserExists, useragent.express
                         email: saveduser.email,
                         phone_number: saveduser.phone_number,
                         utype: saveduser.utype,
-                        date: saveduser.date
+                        createdAt: saveduser.createdAt
                     }
                 }
             })
@@ -98,7 +98,7 @@ router.post('/login', [loginValidation, authLogin], async (req, res) => {
             }
         })
     }
-    /** creat  user token */
+    /** create  user token */
     else {
         const token = jwt.sign({ email: req.body.email }, process.env.SECRET)
         res.header('htapi-token', token).json({
@@ -120,7 +120,6 @@ router.post('/resetpassword', [forgotPasswordValidation, ValidatePhone], async (
     const respass = {
         user: res.datas._id,
         code: genOtp(),
-        date: now,
         expiry: expiry
     }
 
@@ -141,7 +140,7 @@ router.post('/resetpassword', [forgotPasswordValidation, ValidatePhone], async (
 // verify OTP()
 router.post('/verifyotp', (req, res) => {
     PasswordReset.findOne({ $and: [{ _id: req.body.reset_id }, { code: req.body.code }] }).then(data => {
-
+    const nowTime = moment().format()
         if (!data) {
 
             return res.status(400).json({
@@ -149,7 +148,7 @@ router.post('/verifyotp', (req, res) => {
                 error: "Invalid OTP"
             })
         } else {
-            if (data.expiry > now) {
+            if (data.expiry > nowTime) {
                 return res.status(200).json({
                     message: "Verified",
                     data: {
