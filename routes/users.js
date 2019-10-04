@@ -5,7 +5,7 @@ const PasswordReset = require('../models/PasswordReset')
 const jwt = require('jsonwebtoken')
 const { registerValidation, loginValidation, forgotPasswordValidation, resetPasswordValidation } = require('../models/Validations/User')
 const userType = require('../models/UserType')
-const { authLogin, checkuserExists, createRegisterEmail, getHashedPassword, ValidatePhone, verifyOtp } = require('../repositories/userRepo')
+const { authLogin, checkuserExists,userExists, createRegisterEmail, getHashedPassword, ValidatePhone, verifyOtp } = require('../repositories/userRepo')
 const { userEvent } = require('../Events/userEvents')
 var moment = require('moment')
 const now = moment().format()
@@ -178,10 +178,7 @@ router.post('/changepassword', resetPasswordValidation, async (req, res) => {
     const hasp = await getHashedPassword(req.body.password)
     await User.findOneAndUpdate({ _id: req.body.user_id }, { password: hasp }).then(data => {
         res.status(200).json({
-            message: "Password Changed Successfully",
-            next: {
-                message: "Yoo may ask user to sign in with new password now"
-            }
+            message: "Password Changed Successfully"
         })
     }).catch(err => {
 
@@ -205,7 +202,7 @@ router.post('/image', (req, res) => {
 })
 
 // create profile
-router.post('/profile', [checkuserExists], (req, res) => {
+router.post('/profile', [userExists], (req, res) => {
 
     /** 
      {  
@@ -216,42 +213,30 @@ router.post('/profile', [checkuserExists], (req, res) => {
     for (const ops of req.body.data) {
         updateOps[ops.prop] = ops.value
     }
-
-
-
-    User.findOne({ _id: req.body.user }).then(data => {
-        Profile.findOneAndUpdate({_id:data.profile}, { $push: { disease: updateOps.disease } }).then(data => {
-            return res.status(200).json({
+    Profile.findOneAndUpdate({_id:res.datas.profile}, { $set: updateOps }).then(data => {
+            res.status(200).json({
                 message: "Profile Updated"
             })
         }).catch(err => {
             console.log(err);
         })
-
-    }).catch(err => {
-        console.log(err);
     })
-
-    return;
-
-
-})
 
 //get user profile
 
-router.get('/profile', (req, res) => {
-    User.findOne({ _id: req.params.user }).then(data => {
-        Profile.findByIdAndUpdate(data.profile, { $push: { disease: updateOps } }).then(data => {
-            return res.status(200).json({
-                message: "Profile Updated"
+router.get('/profile/:user',[userExists], (req, res) => {
+   Profile.findById(res.datas.profile).then(data => {
+            res.status(200).json({
+                message: "Profile Fetched",
+                data: {
+                    profile: data
+                }
             })
         }).catch(err => {
             console.log(err);
         })
 
-    }).catch(err => {
-        console.log(err);
-    })
+   
 })
 
 const genOtp = () => { return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) }

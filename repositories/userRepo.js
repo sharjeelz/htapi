@@ -94,8 +94,10 @@ const validPhone = async (req, res, next) => {
 
 const userExists = (req, res, next) => {
 
-    User.findById(req.body.user).then(user => {
+    let finduser = req.body.user ? req.body.user : req.params.user
+    User.findById(finduser).then(user => {
         if (user) {
+            res.datas= user
             next()
         }
         
