@@ -17,7 +17,7 @@ app.listen(process.env.PORT, () => {
         console.log('DB Connected (MLAB)')
     })
 })
-
+app.use('/uploads', express.static('upload'));
 //body parser
 app.use(express.json())
 

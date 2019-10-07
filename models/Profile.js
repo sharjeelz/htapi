@@ -7,13 +7,17 @@ const profileSchema = mongoose.Schema({
     disease: {
         type: Array
     },
-    maritalStatus: { type: String },
+    maritalStatus: { type: String ,default:''},
     createdAt: {
         type: String,
         default: now
     },
     updatedAt: {
         type: String,
+    },
+    pic: {
+        type: String,
+        default:''
     }
 
 })

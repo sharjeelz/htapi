@@ -5,7 +5,7 @@ const PasswordReset = require('../models/PasswordReset')
 const jwt = require('jsonwebtoken')
 const { registerValidation, loginValidation, forgotPasswordValidation, resetPasswordValidation } = require('../models/Validations/User')
 const userType = require('../models/UserType')
-const { authLogin, checkuserExists,userExists, createRegisterEmail, getHashedPassword, ValidatePhone, verifyOtp } = require('../repositories/userRepo')
+const { authLogin, checkuserExists, userExists, createRegisterEmail, getHashedPassword, ValidatePhone, verifyOtp } = require('../repositories/userRepo')
 const { userEvent } = require('../Events/userEvents')
 var moment = require('moment')
 const now = moment().format()
@@ -14,8 +14,32 @@ const getLocation = require('../functions/geoip')
 const useragent = require('express-useragent')
 const config = require('../functions/config')
 const myLogger = require('../functions/logger')
-var multer = require('multer')
-var upload = multer({ dest: 'uploads/profile' }).single('img')
+const multer = require('multer')
+const fs= require('fs')
+var path = require('path')
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/profile')
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname)) //Appending extension
+    }
+})
+const fileFilter = (req,file,cb)=>{
+    
+    if(file.mimetype==='image/jpeg' || file.mimetype==='image/png'){
+
+        cb(null,true)
+    }
+    else {
+        cb(null,false)
+    }
+}
+const upload = multer({ storage: storage ,limits:{
+    fileSize: 1024 * 1024 *2
+},fileFilter: fileFilter
+})
+
 const Profile = require('../models/Profile')
 
 /** log User Module Actions : (WIP) */
@@ -47,8 +71,8 @@ router.post('/register', [registerValidation, checkuserExists, useragent.express
         ],
         // others: { agent_data: req.useragent },
         /** TODO: Need to find out a way to upload pic either from node or from front end using aws.. or others */
-        pic: 'http://portfolio.sharjeelz.com/wp-content/uploads/2018/12/12193500_1637646209856358_6420604699381433064_n.jpg',
-        profile: await new Profile({}).save()
+        //pic: 'http://portfolio.sharjeelz.com/wp-content/uploads/2018/12/12193500_1637646209856358_6420604699381433064_n.jpg',
+        profile: await new Profile().save()
 
     })
     await newuser
@@ -140,7 +164,7 @@ router.post('/resetpassword', [forgotPasswordValidation, ValidatePhone], async (
 // verify OTP()
 router.post('/verifyotp', (req, res) => {
     PasswordReset.findOne({ $and: [{ _id: req.body.reset_id }, { code: req.body.code }] }).then(data => {
-    const nowTime = moment().format()
+        const nowTime = moment().format()
         if (!data) {
 
             return res.status(400).json({
@@ -187,16 +211,22 @@ router.post('/changepassword', resetPasswordValidation, async (req, res) => {
 })
 
 // add profile image
-router.post('/image', (req, res) => {
+router.post('/image', [upload.single('img'),userExists], async (req, res) => {
 
-    upload(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-            console.log(err);
-        } else if (err) {
-            console.log(err);
-        }
+    const file = req.file
+    if (!file) {
+        const error = new Error('Please upload a file')
+        error.httpStatusCode = 400
+        
+    }
+    const imageName = req.file.path
+    await Profile.findOneAndUpdate({ _id: res.datas.profile }, { pic: imageName }).then(data => {
+        res.status(200).json({
+            message: "Profile Image Uploaded Successfully"
+        })
+    }).catch(err => {
 
-        console.log(req.file);
+        console.log(err)
     })
 })
 
@@ -212,30 +242,30 @@ router.post('/profile', [userExists], (req, res) => {
     for (const ops of req.body.data) {
         updateOps[ops.prop] = ops.value
     }
-    Profile.findOneAndUpdate({_id:res.datas.profile}, { $set: updateOps }).then(data => {
-            res.status(200).json({
-                message: "Profile Updated"
-            })
-        }).catch(err => {
-            console.log(err);
+    Profile.findOneAndUpdate({ _id: res.datas.profile }, { $set: updateOps }).then(data => {
+        res.status(200).json({
+            message: "Profile Updated"
         })
+    }).catch(err => {
+        console.log(err);
     })
+})
 
 //get user profile
 
-router.get('/profile/:user',[userExists], (req, res) => {
-   Profile.findById(res.datas.profile).then(data => {
-            res.status(200).json({
-                message: "Profile Fetched",
-                data: {
-                    profile: data
-                }
-            })
-        }).catch(err => {
-            console.log(err);
+router.get('/profile/:user', [userExists], (req, res) => {
+    Profile.findById(res.datas.profile).then(data => {
+        res.status(200).json({
+            message: "Profile Fetched",
+            data: {
+                profile: data
+            }
         })
+    }).catch(err => {
+        console.log(err);
+    })
 
-   
+
 })
 
 const genOtp = () => { return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) }
