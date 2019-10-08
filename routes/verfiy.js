@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const getLocation = require('../functions/geoip')
 const eE = 'Access Error'
 const aD = 'Access Denied'
 const iT = 'Invalid Token'
@@ -52,5 +53,17 @@ const userAuth = (req, res, next) => {
     }
 }
 
+const appAuth = (req, res, next) => {
+
+    const my_location = process.env.ENV == 'development' ? getLocation('202.166.163.180') : getLocation(req.ip)
+    if (my_location && my_location.country == 'PK') {
+        next()
+    }
+    else {
+        return res.send(`Note: Dear User From ${my_location.city},${my_location.country} :  This Application is Only For Pakistan <img src="/excdn/extras/pk.png"/> Only`)
+    }
+}
+
 module.exports.adminAuth = adminAuth
 module.exports.userAuth = userAuth
+module.exports.AppAuth = appAuth

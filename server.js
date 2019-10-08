@@ -5,10 +5,7 @@ const mongoose = require('mongoose')
 mongoose.set('useCreateIndex', true)
 mongoose.set('useFindAndModify', false)
 const cors = require('cors')
-const { adminAuth, userAuth } = require('./routes/verfiy')
-const getLocation = require('./functions/geoip')
-
-
+const { adminAuth, userAuth, AppAuth } = require('./routes/verfiy')
 
 //connect server and  DB
 app.listen(process.env.PORT, () => {
@@ -26,19 +23,9 @@ app.use(cors())
 
 
 // Entry for Pakistani's and Kashmiri's only
-app.use('/', (req, res, next) => {
+app.use(AppAuth)
 
-    const my_location = process.env.ENV == 'development' ? getLocation('202.166.163.180') : getLocation(req.ip)
-    if (my_location && my_location.country == 'PK') {
-        res.send('Server Running for HT  API only')
-        next()
-    }
-    else {
-        return res.send(`Note: Dear User From ${my_location.city},${my_location.country} :  This Application is Only For Pakistan <img src="/excdn/extras/pk.png"/> Only`)
-    }
-})
-
-
+process.on('warning', e => console.warn(e.stack));
 
 //Import Routes 
 const UserRoutes = require('./routes/users')
