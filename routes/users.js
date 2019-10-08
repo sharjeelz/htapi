@@ -109,32 +109,30 @@ router.post('/register', [registerValidation, checkuserExists, useragent.express
 //Login User
 router.post('/login', [loginValidation, authLogin], async (req, res) => {
 
+    let token = ''
+    let header = ''
+    let message = ''
     /** creat  Admin token */
     if (res.user_type == 'Admin') {
-        const token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN)
-        res.header('ht-admin-token', token).json({
-            message: "Admin Login Successful",
-            data: {
-                access_token: token
-            },
-            meta: {
-                "message": "use the above token to access admin resources"
-            }
-        })
+        token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN)
+        header = 'ht-admin-token'
+        message = 'Admin Login Successful'
     }
-    /** create  user token */
     else {
-        const token = jwt.sign({ email: req.body.email }, process.env.SECRET)
-        res.header('htapi-token', token).json({
-            message: "Login Successful",
-            data: {
-                access_token: token
-            },
-            meta: {
-                "message": "use the above token to access private resources"
-            }
-        })
+        token = jwt.sign({ email: req.body.email }, process.env.SECRET)
+        header = 'ht-token'
+        message = 'Login Successful'
     }
+
+    res.header(header, token).json({
+        message: message,
+        data: {
+            access_token: token
+        },
+        meta: {
+            "message": "use the above token to access resources"
+        }
+    })
 })
 
 

@@ -35,7 +35,7 @@ const publicRoutes = require('./routes/public')
 
 //Use Middleware
 app.use('/user', UserRoutes)
-app.use('/post', postRoutes)
+app.use('/post',postRoutes)
 app.use('/admin', adminRoutes)
 app.use('/public', publicRoutes)
 

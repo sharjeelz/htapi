@@ -31,7 +31,7 @@ const adminAuth = (req, res, next) => {
 
 const userAuth = (req, res, next) => {
 
-    const token = req.header('htapi-token')
+    const token = req.header('ht-token')
     if (!token) {
         return res.status(401).json({
             message: eE,
