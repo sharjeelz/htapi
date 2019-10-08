@@ -1,60 +1,79 @@
-const Joi = require('@hapi/joi');
+const Joi = require('@hapi/joi')
 
 //Register Validation 
-const vErro = 'Validation Error';
+const vErro = 'Validation Error'
 
-const registerValidation = (req,res,next) => {
+const registerValidation = (req, res, next) => {
     const schema = Joi.object({
         first_name: Joi.string().required(),
         last_name: Joi.string().required(),
         phone_number: Joi.number().required(),
-        email: Joi.string().required().email().max(30),
+        email: Joi.string().required().email().max(40),
         password: Joi.string().min(6).required(),
         repeat_password: Joi.ref('password'),
         gender: Joi.string()
-    });
-    const validataionHas = schema.validate(req.body);
+    })
+    const validataionHas = schema.validate(req.body)
     if (validataionHas.error) {
         return res.status(400).json({
-            message : vErro,
+            message: vErro,
             error: validataionHas.error.details[0].message
-        });
-         }
-    next();
+        })
+    }
+    next()
 }
 
 //Login Validation 
 
-const loginValidation = (req,res,next) => {
+const loginValidation = (req, res, next) => {
     const schema = Joi.object({
         email: Joi.string().required().email(),
         password: Joi.string().min(6).required()
-    });
+    })
 
-    const validataionHas = schema.validate(req.body);
+    const validataionHas = schema.validate(req.body)
     if (validataionHas.error) {
         return res.status(400).json({
-            message : vErro,
+            message: vErro,
             error: validataionHas.error.details[0].message
-        });
+        })
     }
-    next();
+    next()
 }
-const ForgotPasswordValidation = (req,res,next) => {
+const ForgotPasswordValidation = (req, res, next) => {
     const schema = Joi.object({
         phone_number: Joi.string().required()
-    });
-    const validataionHas  = schema.validate(req.body);
+    })
+    const validataionHas = schema.validate(req.body)
     if (validataionHas.error) {
         return res.status(400).json({
-            message : vErro,
+            message: vErro,
             error: validataionHas.error.details[0].message
-        });
+        })
     }
-    next();
+    next()
 }
 
-module.exports.registerValidation = registerValidation;
-module.exports.loginValidation = loginValidation;
-module.exports.forgotPasswordValidation = ForgotPasswordValidation;
+
+const resetPasswordValidation = (req, res, next) => {
+    const schema = Joi.object({
+        user_id: Joi.string().required(),
+        password: Joi.string().min(6).required(),
+        repeat_password: Joi.ref('password'),
+    })
+    const validataionHas = schema.validate(req.body)
+    if (validataionHas.error) {
+        return res.status(400).json({
+            message: vErro,
+            error: validataionHas.error.details[0].message
+        })
+    }
+    next()
+}
+
+module.exports.registerValidation = registerValidation
+module.exports.loginValidation = loginValidation
+module.exports.forgotPasswordValidation = ForgotPasswordValidation
+module.exports.resetPasswordValidation = resetPasswordValidation
+
 

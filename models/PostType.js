@@ -1,27 +1,29 @@
 const mongoose = require('mongoose')
 
 
-const UserTypeSchema = mongoose.Schema({
+const PostTypeSchema = mongoose.Schema({
 
-    utype: {
+    ptype: {
         type: String,
         required: true
     }
 
 
 })
-UserTypeSchema.pre('findOneAndUpdate', function (next) {
+
+PostTypeSchema.pre('findOneAndUpdate', function (next) {
     this.update({}, { $set: { updatedAt: now } });
     next()
 })
 
-UserTypeSchema.pre('update', function (next) {
+PostTypeSchema.pre('update', function (next) {
     this.update({}, { $set: { updatedAt: now } });
     next()
 })
 
-UserTypeSchema.pre('findByIdAndUpdate', function (next) {
+PostTypeSchema.pre('findByIdAndUpdate', function (next) {
     this.update({}, { $set: { updatedAt: now } });
     next()
 })
-module.exports = mongoose.model('UserType', UserTypeSchema)
+
+module.exports = mongoose.model('PostType', PostTypeSchema)
