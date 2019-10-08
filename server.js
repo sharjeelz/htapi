@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 mongoose.set('useCreateIndex', true)
 mongoose.set('useFindAndModify', false)
 const cors = require('cors')
-const {adminAuth,userAuth} = require('./routes/verfiy')
+const { adminAuth, userAuth } = require('./routes/verfiy')
 const getLocation = require('./functions/geoip')
 
 
@@ -17,24 +17,24 @@ app.listen(process.env.PORT, () => {
         console.log('DB Connected (MLAB)')
     })
 })
-app.use('/uploads', express.static('upload'));
+app.use('/excdn', express.static('uploads'));
 //body parser
 app.use(express.json())
 
 //enable cors
 app.use(cors())
 
+
 // Entry for Pakistani's and Kashmiri's only
-app.get('/',(req,res,next)=>{
-    
-    let my_location = process.env.ENV=='development' ? getLocation('202.166.163.180') : getLocation(req.ip)
-    if(my_location && my_location.country=='PK') {
+app.use('/', (req, res, next) => {
+
+    const my_location = process.env.ENV == 'development' ? getLocation('202.166.163.180') : getLocation(req.ip)
+    if (my_location && my_location.country == 'PK') {
         res.send('Server Running for HT  API only')
         next()
     }
-    else
-    {
-        return res.send('Only For Pakistan and Kashmiris')
+    else {
+        return res.send(`Note: Dear User From ${my_location.city},${my_location.country} :  This Application is Only For Pakistan <img src="/excdn/extras/pk.png"/> Only`)
     }
 })
 
@@ -47,10 +47,10 @@ const postRoutes = require('./routes/posts')
 const publicRoutes = require('./routes/public')
 
 //Use Middleware
-app.use('/user',UserRoutes)
-app.use('/post',userAuth,postRoutes)
-app.use('/admin',adminRoutes)
-app.use('/public',publicRoutes)
+app.use('/user', UserRoutes)
+app.use('/post', postRoutes)
+app.use('/admin', adminRoutes)
+app.use('/public', publicRoutes)
 
 
 

@@ -42,7 +42,16 @@ router.get('/user/:id', (req, res) => {
     Post.find({ user: req.params.id })
         .select('createdAt message')
         .populate('user', 'first_name last_name')
-        .populate('posttype', 'ptype')
+        .populate('posttype', 'ptype').populate({
+            path: 'comments',
+            select: 'comment createdAt',
+            //match: { user:'5d92f0d3cf6ef50f2866a07e'},
+            options: { sort: { createdAt: -1 } } ,
+            populate: {
+                path: 'user',
+                select: 'first_name last_name pic',
+            }
+        })
         .then(posts => {
             if (posts.length > 0) {
                 res.status(200).json({
@@ -68,7 +77,16 @@ router.get('/:id', (req, res) => {
 
     Post.find({ _id: req.params.id })
         .populate('user', 'first_name last_name')
-        .populate('posttype', 'ptype')
+        .populate('posttype', 'ptype').populate({
+            path: 'comments',
+            select: 'comment createdAt',
+            //match: { user:'5d92f0d3cf6ef50f2866a07e'},
+            options: { sort: { createdAt: -1 } } ,
+            populate: {
+                path: 'user',
+                select: 'first_name last_name pic',
+            }
+        })
         .then(async post => {
             if (post.length > 0) {
 

@@ -21,12 +21,6 @@ class myLogger {
     }
 
     console.log(log);
-    // fs.appendFile('SpamLoggers.txt','asd').then(data=>{
-      
-    // }).catch(err=>{
-    //   res.send('sad'+err);
-    // })
-
     return res.status(400).json({
       message: "Not Allowed Words, your data may be logged for investigation"
     })

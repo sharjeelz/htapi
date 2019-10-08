@@ -7,6 +7,7 @@ const eOpE = 'Password or email is wrong'
 const eE = 'User Already Exists'
 const fNf = 'Phone Number Not Found'
 const uNf = 'User Not Found'
+const iVu = 'Invalid User'
 
 const hashedpass = async (password) => {
     /** hash the password */
@@ -93,19 +94,27 @@ const validPhone = async (req, res, next) => {
 
 const userExists = (req, res, next) => {
 
-    let finduser = req.body.user ? req.body.user : req.params.user
+    const finduser = req.body.user ? req.body.user : req.params.user
     User.findById(finduser).then(user => {
+
         if (user) {
-            res.datas= user
+            res.datas = user
             next()
+        } else {
+            return res.status(400).json({
+                message: dError,
+                error: uNf
+            })
         }
-        
+
     }).catch(err => {
+
         return res.status(400).json({
             message: dError,
-            error: uNf
+            error: iVu
         })
     })
+
 }
 
 

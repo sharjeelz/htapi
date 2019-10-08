@@ -30,7 +30,7 @@ router.put('/user/:id', async (req, res) => {
 router.get('/user/list', async (req, res) => {
     await User
         .find({})
-        .sort({'createdAt': -1})
+        .sort({ 'createdAt': -1 })
         .select('first_name last_name email phone_number createdAt location')
         .populate('utype', 'utype')
         .then(data => {
@@ -89,16 +89,16 @@ router.get('/migrate/posttype', async (req, res) => {
 router.post('/spamit', async (req, res) => {
 
     const spam = new Spam({
-        word:req.body.word
+        word: req.body.word
     });
-    spam.save().then(saved=>{
+    spam.save().then(saved => {
         return res.status(201).json({
             message: "Spammed"
         })
-    }).catch(err=>{
+    }).catch(err => {
         res.status(400).json({
             message: "Data Error",
-            error : err
+            error: err
         })
     })
 

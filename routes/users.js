@@ -9,13 +9,12 @@ const { authLogin, checkuserExists, userExists, createRegisterEmail, getHashedPa
 const { userEvent } = require('../Events/userEvents')
 var moment = require('moment')
 const now = moment().format()
-const expiry = moment().add('60', 's').format()
 const getLocation = require('../functions/geoip')
 const useragent = require('express-useragent')
 const config = require('../functions/config')
 const myLogger = require('../functions/logger')
 const multer = require('multer')
-const fs= require('fs')
+const fs = require('fs')
 var path = require('path')
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -25,19 +24,20 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + path.extname(file.originalname)) //Appending extension
     }
 })
-const fileFilter = (req,file,cb)=>{
-    
-    if(file.mimetype==='image/jpeg' || file.mimetype==='image/png'){
+const fileFilter = (req, file, cb) => {
 
-        cb(null,true)
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+
+        cb(null, true)
     }
     else {
-        cb(null,false)
+        cb(null, false)
     }
 }
-const upload = multer({ storage: storage ,limits:{
-    fileSize: 1024 * 1024 *2
-},fileFilter: fileFilter
+const upload = multer({
+    storage: storage, limits: {
+        fileSize: 1024 * 1024 * 2
+    }, fileFilter: fileFilter
 })
 
 const Profile = require('../models/Profile')
@@ -144,7 +144,7 @@ router.post('/resetpassword', [forgotPasswordValidation, ValidatePhone], async (
     const respass = {
         user: res.datas._id,
         code: genOtp(),
-        expiry: expiry
+        expiry: moment().add('60', 's').format()
     }
 
     await PasswordReset.findOneAndUpdate({ user: res.datas._id }, respass, { upsert: true }).then(response => {
@@ -211,13 +211,15 @@ router.post('/changepassword', resetPasswordValidation, async (req, res) => {
 })
 
 // add profile image
-router.post('/image', [upload.single('img'),userExists], async (req, res) => {
+router.post('/image', [upload.single('img'), userExists], async (req, res) => {
 
     const file = req.file
     if (!file) {
-        const error = new Error('Please upload a file')
-        error.httpStatusCode = 400
-        
+
+        return res.status(400).json({
+            message: "Validation Error",
+            error: 'Image is Required'
+        })
     }
     const imageName = req.file.path
     await Profile.findOneAndUpdate({ _id: res.datas.profile }, { pic: imageName }).then(data => {
@@ -231,7 +233,7 @@ router.post('/image', [upload.single('img'),userExists], async (req, res) => {
 })
 
 // create profile
-router.post('/profile', [userExists], (req, res) => {
+router.put('/profile', [userExists], (req, res) => {
 
     /** 
      {  
