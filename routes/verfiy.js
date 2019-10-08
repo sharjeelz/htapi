@@ -54,7 +54,7 @@ const userAuth = (req, res, next) => {
 }
 
 const appAuth = (req, res, next) => {
-
+    //romania ip for testing 193.176.84.29
     const my_location = process.env.ENV == 'development' ? getLocation('202.166.163.180') : getLocation(req.ip)
     if (my_location && my_location.country == 'PK') {
         next()
@@ -66,4 +66,4 @@ const appAuth = (req, res, next) => {
 
 module.exports.adminAuth = adminAuth
 module.exports.userAuth = userAuth
-module.exports.AppAuth = appAuth
+module.exports.appAuth = appAuth
