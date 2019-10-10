@@ -266,6 +266,31 @@ router.get('/profile/:user', [userExists], (req, res) => {
     })
 })
 
+// update user 
+
+router.put('/', [userExists],async (req, res) => {
+
+    if (!req.body) {
+        return res.status(400).json({
+            message: 'Validataion Error',
+            error: 'Parameters Missing'
+        })
+    }
+    const updateOps = {}
+    for (const ops of req.body.data) {
+        if(ops.prop!=='phone_number'){
+        updateOps[ops.prop] = ops.value
+        }
+
+    }
+
+    await User.updateOne({ _id: req.body.user }, { $set: updateOps }).then((data) => {
+
+        res.status(200).json({ message: 'User Updated' })
+    }).catch(err => {
+        res.status(400).send(err)
+    })
+})
 const genOtp = () => { return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) }
 
 module.exports = router
