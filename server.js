@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 mongoose.set('useCreateIndex', true)
 mongoose.set('useFindAndModify', false)
 const cors = require('cors')
-const { adminAuth, userAuth, AppAuth } = require('./routes/verfiy')
+const { adminAuth, userAuth, appAuth } = require('./routes/verfiy')
 
 //connect server and  DB
 app.listen(process.env.PORT, () => {
@@ -22,8 +22,8 @@ app.use(express.json())
 app.use(cors())
 
 
-// Entry for Pakistani's and Kashmiri's only
-app.use(AppAuth)
+// Entry for Pakistani's only
+app.use(appAuth)
 
 process.on('warning', e => console.warn(e.stack));
 
@@ -35,7 +35,7 @@ const publicRoutes = require('./routes/public')
 
 //Use Middleware
 app.use('/user', UserRoutes)
-app.use('/post', postRoutes)
+app.use('/post',postRoutes)
 app.use('/admin', adminRoutes)
 app.use('/public', publicRoutes)
 

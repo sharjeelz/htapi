@@ -109,32 +109,30 @@ router.post('/register', [registerValidation, checkuserExists, useragent.express
 //Login User
 router.post('/login', [loginValidation, authLogin], async (req, res) => {
 
+    let token = ''
+    let header = ''
+    let message = ''
     /** creat  Admin token */
     if (res.user_type == 'Admin') {
-        const token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN)
-        res.header('ht-admin-token', token).json({
-            message: "Admin Login Successful",
-            data: {
-                access_token: token
-            },
-            meta: {
-                "message": "use the above token to access admin resources"
-            }
-        })
+        token = jwt.sign({ email: req.body.email }, process.env.SECRETADMIN)
+        header = 'ht-admin-token'
+        message = 'Admin Login Successful'
     }
-    /** create  user token */
     else {
-        const token = jwt.sign({ email: req.body.email }, process.env.SECRET)
-        res.header('htapi-token', token).json({
-            message: "Login Successful",
-            data: {
-                access_token: token
-            },
-            meta: {
-                "message": "use the above token to access private resources"
-            }
-        })
+        token = jwt.sign({ email: req.body.email }, process.env.SECRET)
+        header = 'ht-token'
+        message = 'Login Successful'
     }
+
+    res.header(header, token).json({
+        message: message,
+        data: {
+            access_token: token
+        },
+        meta: {
+            "message": "use the above token to access resources"
+        }
+    })
 })
 
 
@@ -266,10 +264,33 @@ router.get('/profile/:user', [userExists], (req, res) => {
     }).catch(err => {
         console.log(err);
     })
-
-
 })
 
+// update user 
+
+router.put('/', [userExists],async (req, res) => {
+
+    if (!req.body) {
+        return res.status(400).json({
+            message: 'Validataion Error',
+            error: 'Parameters Missing'
+        })
+    }
+    const updateOps = {}
+    for (const ops of req.body.data) {
+        if(ops.prop!=='phone_number'){
+        updateOps[ops.prop] = ops.value
+        }
+
+    }
+
+    await User.updateOne({ _id: req.body.user }, { $set: updateOps }).then((data) => {
+
+        res.status(200).json({ message: 'User Updated' })
+    }).catch(err => {
+        res.status(400).send(err)
+    })
+})
 const genOtp = () => { return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1) }
 
 module.exports = router

@@ -31,7 +31,7 @@ router.get('/user/list', async (req, res) => {
     await User
         .find({})
         .sort({ 'createdAt': -1 })
-        .select('first_name last_name email phone_number createdAt location')
+        .select('first_name last_name email phone_number createdAt updatedAt location')
         .populate('utype', 'utype')
         .then(data => {
             res.send(data)
