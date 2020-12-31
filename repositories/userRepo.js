@@ -29,7 +29,8 @@ const authLogin = async (req, res, next) => {
             })
         }
         else {
-            const validPassword = await bcrypt.compare(req.body.password, user.password)
+            const validPassword = await bcrypt.compare(req.body.password, user.password);
+            console.log('user', user);
             res.user_type = user.utype.utype
             if (!validPassword) {
                 return res.status(400).json({
